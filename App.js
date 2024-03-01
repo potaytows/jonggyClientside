@@ -7,6 +7,7 @@ import LoginScreen from './screens/login';
 import HomeScreen from './screens/home';
 import ProfileScreen from './screens/profile';
 import RestaurantDetailScreen from './screens/RestaurantDetailScreen'; 
+import * as SecureStore from 'expo-secure-store';
 
 const Stack = createStackNavigator();
 
