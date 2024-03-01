@@ -37,13 +37,13 @@ const App=()=> {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        screenOptions={{ headerStyle: { backgroundColor: '#ff8a24' }, headerTintColor: 'white' }}>
+        screenOptions={{ headerStyle: { backgroundColor: '#ff8a24' }, headerTintColor: 'white' ,headerTitleAlign: 'center'}}>
         <Stack.Screen name="tab" component={Tabs} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name={'profile'} component={ProfileScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} />
         
       </Stack.Navigator>
     </NavigationContainer>
