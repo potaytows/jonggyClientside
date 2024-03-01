@@ -41,7 +41,7 @@ const RestaurantDetailScreen = () => {
                 <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
                 
             </View>
-            <Text style={styles.help}>ความต้องการเพิ่มเติม</Text>
+            <Text style={styles.help}>ความต้องการเพิ่มเติมม</Text>
             <TextInput
                 style={styles.input}
                 value={phonenumber}
