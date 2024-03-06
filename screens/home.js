@@ -75,7 +75,7 @@ const HomeScreen = ({navigation}) => {
 
             ):(
               <TouchableOpacity
-              onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id })}
+              onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id ,restaurantName:item.restaurantName})}
         key={item._id}
             >
               <View style={styles.card}>
