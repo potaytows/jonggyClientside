@@ -8,6 +8,7 @@ import HomeScreen from './screens/home';
 import ProfileScreen from './screens/profile';
 import RestaurantDetailScreen from './screens/RestaurantDetailScreen'; 
 import * as SecureStore from 'expo-secure-store';
+import ReservationScreen from './screens/reservation';
 
 const Stack = createStackNavigator();
 
@@ -45,6 +46,7 @@ const App=()=> {
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name='profile' component={ProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name='reserve' component={ReservationScreen}  />
         <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName})}/>
         
       </Stack.Navigator>

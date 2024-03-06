@@ -8,23 +8,32 @@ import _ from 'lodash';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const RestaurantDetailScreen = ({ route }) => {
+const RestaurantDetailScreen = ({ route, navigation }) => {
   const [obj, setData] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [phonenumber, setPhonenumber] = useState('');
+  const [request, setRequest] = useState('');
   const [restaurantDetails, setRestaurantDetails] = useState(null);
-  
-  function compareObjs(obj1,obj2){
-    return JSON.stringify(obj1)===JSON.stringify(obj2);
-}
+
+  const handlecomplete = () => {
+    // ส่งข้อมูลไปยังหน้า ReservationScreen
+    navigation.navigate('reserve', {
+      restaurantId: route.params.restaurantId,
+      restaurantName: restaurantDetails.restaurantName,
+      selectedTables: selected
+    });
+  };
+
+  function compareObjs(obj1, obj2) {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
   const contains = (arr, val) => {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] === val) {
-            return true;
-        }
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === val) {
+        return true;
+      }
     }
 
-      return false;
+    return false;
 
   }
   const addSelected = (val) => {
@@ -71,7 +80,7 @@ const RestaurantDetailScreen = ({ route }) => {
 
   const TableComponent = (props) => {
     const item = props.item
-    if (contains(selected,item)) {
+    if (contains(selected, item)) {
       return (
         <TouchableOpacity onPress={() => removeSelected(item)}>
           <View style={styles.dragablecontent}>
@@ -93,7 +102,7 @@ const RestaurantDetailScreen = ({ route }) => {
         </TouchableOpacity>
 
       )
-    }else{
+    } else {
       return (
         <TouchableOpacity onPress={() => addSelected(item)}>
           <View style={styles.dragablecontent}>
@@ -131,21 +140,33 @@ const RestaurantDetailScreen = ({ route }) => {
           </View>
           <View style={styles.dragablecontainer}>
             {obj.map((item, index) => (
-              <TableComponent item={item} key={index}/>
+              <TableComponent item={item} key={index} />
             ))}
           </View>
-          <Text style={styles.help}>ความต้องการเพิ่มเติม</Text>
-          <TextInput
-            style={styles.input}
-            value={phonenumber}
-            onChangeText={text => setPhonenumber(text)}
-          />
-
+          <View style={styles.requestContainer} >
+            <Text style={styles.help}>ความต้องการเพิ่มเติม</Text>
+            <TextInput
+              style={styles.input}
+              value={request}
+              onChangeText={text => setRequest(text)}
+            />
+          </View>
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.reserveButton} >
-        <Text style={styles.reserveButtonText}>ยืนยันการจอง</Text>
-      </TouchableOpacity>
+      <View style={styles.viewshow} >
+        <Text style={styles.showtable}>
+          โต๊ะที่เลือก: {selected.map((item, index) => (
+            index == selected.length - 1 ? (
+              <Text key={index} >{item.tableName}</Text>
+            ) : (<Text key={index} >{item.tableName}, </Text>)
+
+          ))}
+        </Text>
+
+        <TouchableOpacity style={styles.reserveButton} onPress={handlecomplete} >
+          <Text style={styles.reserveButtonText}>ยืนยันการจอง</Text>
+        </TouchableOpacity>
+      </View>
     </View>
 
 
@@ -155,16 +176,20 @@ const RestaurantDetailScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
-    marginTop: 30,
+    backgroundColor:'#F0F0F0',
     flexDirection: 'column',
-    alignItems: 'stretch',
-    position: 'relative',
     paddingBottom: 50
   },
   restaurantContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginLeft:20,
+    
+    marginTop: 30,
+  },
+  requestContainer:{
+    marginLeft: 20,
+
   },
   logoRes: {
     width: 80,
@@ -196,6 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#fff',
     width: '70%',
+    marginBottom: '20%'
   },
   help: {
     marginTop: 20
@@ -206,18 +232,33 @@ const styles = StyleSheet.create({
     width: 350,
     height: 450,
     alignSelf: 'center',
-    marginVertical: 20,
-    borderColor: 'black',
-    borderWidth: 1
+    marginVertical: 20,  
+
   },
   tablecontainer: {
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  }, dragablecontent: {
+  }, 
+  dragablecontent: {
     position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: 'center', 
+    alignSelf: 'center'
+    
+  },
+  viewshow: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: 'white',
+    height: '15%',
+    width: '100%',
+    borderTopWidth: 2,
+    borderTopColor: '#E6E6E6'
+  },
+  showtable: {
+    marginTop: 15,
+    marginLeft: 10
   }
 });
 
