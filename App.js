@@ -20,6 +20,7 @@ const App=()=> {
     
 
     try {
+      console.log("this is from chi's")
       user = await SecureStore.getItemAsync('userAuth');
       setUserAuth(user)
 
