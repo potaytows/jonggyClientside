@@ -21,7 +21,7 @@ const App=()=> {
     
 
     try {
-      console.log("this is from chi's")
+
       user = await SecureStore.getItemAsync('userAuth');
       setUserAuth(user)
 
@@ -44,8 +44,8 @@ const App=()=> {
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
-        <Stack.Screen name={'profile'} component={ProfileScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} />
+        <Stack.Screen name='profile' component={ProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName})}/>
         
       </Stack.Navigator>
     </NavigationContainer>
