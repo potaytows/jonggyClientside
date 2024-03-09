@@ -9,6 +9,11 @@ import ProfileScreen from './screens/profile';
 import RestaurantDetailScreen from './screens/RestaurantDetailScreen'; 
 import * as SecureStore from 'expo-secure-store';
 import ReservationScreen from './screens/reservation';
+import EditProfileScreen from './screens/edit_profile';
+import PasswordResetScreen from './screens/resetPassword';
+import PasswordNewScreen from './screens/passwordnew';
+import OTPVerificationScreen from './screens/verifyOTP';
+
 
 const Stack = createStackNavigator();
 
@@ -47,6 +52,11 @@ const App=()=> {
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name='profile' component={ProfileScreen} options={{ headerShown: false }} />
         <Stack.Screen name='reserve' component={ReservationScreen}  />
+        <Stack.Screen name='EditProfile' component={EditProfileScreen}  />
+        <Stack.Screen name='forgotPassword' component={PasswordResetScreen}  />
+        <Stack.Screen name='editPassword' component={PasswordNewScreen}  />
+        <Stack.Screen name='otp' component={OTPVerificationScreen}  />
+
         <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName})}/>
         
       </Stack.Navigator>

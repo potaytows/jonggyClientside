@@ -12,6 +12,10 @@ const LoginScreen = ({ navigation }) => {
     const handleRegisterPress = () => {
         navigation.navigate('Register');
     };   
+    const handleForgotPassword = () => {
+        navigation.navigate('forgotPassword');
+      };
+
     const handleLogin = async () => {
         if (!username || !password) {
             Alert.alert('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน');
@@ -63,7 +67,7 @@ const LoginScreen = ({ navigation }) => {
                     secureTextEntry
                 />
 
-                <TouchableOpacity style={styles.buttonwellcome}>
+                <TouchableOpacity style={styles.buttonwellcome} onPress={handleForgotPassword}>
                     <Text style={styles.textbutton}>ลืมรหัสผ่าน</Text>
                 </TouchableOpacity>
 

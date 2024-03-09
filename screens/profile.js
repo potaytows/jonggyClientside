@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
@@ -9,6 +9,11 @@ const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const ProfileScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+
+  const handleEditProfile = () => {
+    navigation.navigate('EditProfile', { userInfo });
+  }; 
+
 
   const checkLoginStatus = async () => {
     try {
@@ -56,9 +61,9 @@ const ProfileScreen = ({ navigation }) => {
     <View style={styles.container}>
       {isLoggedIn ? (
          <View>
-         <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
-         <Text>อีเมล: {userInfo?.email}</Text>
-         <Text>เบอร์โทรศัพท์: {userInfo?.phonenumber}</Text>
+           <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
+           <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
+        </TouchableOpacity>
          <Button title="ออกจากระบบ" onPress={handleLogout} />
        </View>
       ) : (
