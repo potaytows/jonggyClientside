@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import axios from 'axios';
+
+const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
 const OTPVerificationScreen = ({ route,navigation }) => {
-  const [otp, setOTP] = useState('');
+    const { email } = route.params;
+    const [otp, setOTP] = useState('');
 
-  const handleVerifyOTP = () => {
-    navigation.navigate('editPassword');
-    
+  const handleVerifyOTP = async () => {
+    try {
+      const response = await axios.post(`${apiheader}/users/verify-otp`, { email, otp });
+      
+      if (response.data.status === 'OTP verified') {
+        Alert.alert('Success', 'OTP verified successfully');
+        navigation.navigate('editPassword', { email });
+      } else {
+        Alert.alert('Error', 'Invalid OTP or OTP has expired');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Internal Server Error');
+    }
   };
 
   return (

@@ -9,8 +9,43 @@ const PasswordNewScreen = ({ route, navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleResetPassword = async () => {
-    navigation.navigate('Login');
-   
+    try {
+      const { email } = route.params;
+  
+      if (newPassword !== confirmPassword) {
+        Alert.alert('Error', 'รหัสผ่านไม่ตรงกัน');
+        return;
+      }
+  
+      Alert.alert(
+        'ยืนยันการเปลี่ยนรหัสผ่าน',
+        'คุณต้องการเปลี่ยนรหัสผ่านใช่หรือไม่?',
+        [
+          {
+            text: 'ยกเลิก', style: 'cancel',
+          },
+          {
+            text: 'ตกลง',
+            onPress: async () => {
+              const response = await axios.post(`${apiheader}/users/resetPassword/${email}`, {
+                newPassword,
+              });
+  
+              if (response.data.status === 'password reset success') {
+                Alert.alert('Success', 'รหัสผ่านถูกเปลี่ยนแล้ว');
+                navigation.navigate('Login'); 
+              } else {
+                Alert.alert('Error', 'เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน');
+              }
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      Alert.alert('Error', 'Internal Server Error');
+    }
   };
 
   return (

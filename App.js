@@ -55,7 +55,7 @@ const App=()=> {
         <Stack.Screen name='EditProfile' component={EditProfileScreen}  />
         <Stack.Screen name='forgotPassword' component={PasswordResetScreen}  />
         <Stack.Screen name='editPassword' component={PasswordNewScreen}  />
-        <Stack.Screen name='otp' component={OTPVerificationScreen}  />
+        <Stack.Screen name='OTPVerification' component={OTPVerificationScreen}  />
 
         <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName})}/>
         

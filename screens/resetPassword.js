@@ -8,7 +8,20 @@ const PasswordResetScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
 
   const handleSendOTP = async () => {
-    navigation.navigate('otp');
+    try {
+      const response = await axios.post(`${apiheader}/users/forgotPassword`, { email });
+      
+      if (response.data.status === 'success') {
+        Alert.alert('Success', 'Reset link sent to user email');
+        navigation.navigate('OTPVerification', { email });
+
+      } else {
+        Alert.alert('Error', 'Failed to send reset link. Please try again.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to send reset link. Please try again.');
+    }
   };
 
   return (

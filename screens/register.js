@@ -1,50 +1,66 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert,Pressable} from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [birthday, setBirthday] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  
-  const fetchaddUser = async ()=>{
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (selectedDate) => {
+    hideDatePicker();
+    if (selectedDate) {
+      setBirthday(selectedDate.toDateString());
+    }
+  };
+
+
+  const fetchaddUser = async () => {
 
     if (password !== confirmPassword) {
-        Alert.alert('', 'รหัสผ่านไม่ตรงกัน', [{ text: 'OK', onPress: () => { } }]);
-      } else {
-  
-        console.log('User registered successfully');
-        console.log('Username: ', username);
-        console.log('Email: ', email);
-        console.log('Password: ', password);
-        console.log('Birthday: ', birthday);
-        console.log('Phonenumber: ', phonenumber);
-  
-      }
-    try {
-        const fetchOptions={
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({username:username, email:email, password:password, birthday:birthday, phonenumber:phonenumber})
-        };
-        const response = await fetch(apiheader + '/users/addUser',fetchOptions);
-        const result = await response.json();
-        console.log(result);
+      Alert.alert('', 'รหัสผ่านไม่ตรงกัน', [{ text: 'OK', onPress: () => { } }]);
+    } else {
 
-        navigation.navigate('Login'); 
-        Alert.alert('', 'สมัครเสร็จสิ้น', [{ text: 'OK', onPress: () => {} }]);
+      console.log('User registered successfully');
+      console.log('Username: ', username);
+      console.log('Email: ', email);
+      console.log('Password: ', password);
+      console.log('Birthday: ', birthday);
+      console.log('Phonenumber: ', phonenumber);
+
+    }
+    try {
+      const fetchOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, email: email, password: password, birthday: birthday, phonenumber: phonenumber })
+      };
+      const response = await fetch(apiheader + '/users/addUser', fetchOptions);
+      const result = await response.json();
+      console.log(result);
+
+      navigation.navigate('Login');
+      Alert.alert('', 'สมัครเสร็จสิ้น', [{ text: 'OK', onPress: () => { } }]);
 
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
 
-}
+  }
 
   return (
     <View style={styles.container}>
@@ -72,14 +88,24 @@ const RegisterScreen = ({navigation}) => {
           secureTextEntry
         />
         <Text style={styles.inputs}>วัน/เดือน/ปี เกิด</Text>
-        <TextInput
-        placeholder='วว/ดด/ปป'
-        placeholderTextColor="gray"
-          style={styles.input}
-          value={birthday}
-          onChangeText={text => setBirthday(text)}
-        />
+      
+          <Pressable onPress={showDatePicker}>
+            <TextInput
+              placeholderTextColor="gray"
+              style={styles.input}
+              value={birthday}
+              onChangeText={text => setBirthday(text)}
+              editable={false}
+            />
+          </Pressable>
 
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          locale="th"
+        />
         <Text style={styles.inputs}>อีเมล์</Text>
         <TextInput
           style={styles.input}
@@ -88,7 +114,7 @@ const RegisterScreen = ({navigation}) => {
         />
         <Text style={styles.inputs}>เบอร์โทรศัพท์</Text>
         <TextInput
-        
+
           style={styles.input}
           value={phonenumber}
           onChangeText={text => setPhonenumber(text)}
@@ -105,7 +131,7 @@ const RegisterScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   inputs: {
-    marginLeft: 45, 
+    marginLeft: 45,
     color: '#FF914D',
     marginBottom: 5
 
@@ -125,7 +151,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color:'#F66060'
+    color: '#F66060'
 
   },
   input: {
