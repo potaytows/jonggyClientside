@@ -7,10 +7,18 @@ import _ from 'lodash';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const ReservationScreen = ({ route }) => {
+const ReservationScreen = ({ navigation,route }) => {
     const [request, setRequest] = useState('');
     const [restaurantDetails, setRestaurantDetails] = useState(null);
     const [selectedTables, setSelectedTables] = useState([]);
+
+    const handleGetMenu = () => {
+        navigation.navigate('menuTable',{
+        restaurantId: route.params.restaurantId,
+        selectedTables: selectedTables,
+        
+        });
+    };
 
     const fetchRestaurantDetails = async () => {
         try {
@@ -21,6 +29,7 @@ const ReservationScreen = ({ route }) => {
             console.error(error);
         }
     };
+
 
     useEffect(() => {
         fetchRestaurantDetails();
@@ -35,13 +44,14 @@ const ReservationScreen = ({ route }) => {
         );
     }
 
-    return (
-        <View>
-            <ScrollView>
+    return (    
                 <View style={styles.container}>
+                <ScrollView>
                     <View style={styles.restaurantContainer}>
+
                         <Image style={styles.logoRes} source={{ uri: apiheader + '/image/getRestaurantIcon/' + restaurantDetails._id }} />
-                        <View>
+                        <View style={styles.restaurantContainer2}>
+
                             <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
 
                             <Text style={styles.selectedTables}>โต๊ะที่เลือก:</Text>
@@ -52,12 +62,22 @@ const ReservationScreen = ({ route }) => {
                                     ) : (<Text key={index} >{item.tableName}, </Text>)
                                 ))}
                             </Text>
+
                         </View>
+                        <TouchableOpacity style={styles.button}  onPress={handleGetMenu}>
+                            <Text style={styles.buttonText}>สั่งอาหารล่วงหน้า</Text>
+                        </TouchableOpacity>
+
                     </View>
-                </View>
+                    <Text style={styles.rq}>ความต้องการเพิ่มเติม</Text>
 
             </ScrollView>
-        </View>
+            <TouchableOpacity style={styles.buttonReserve}>
+                            <Text style={styles.buttonText}>ยืนยันการจอง</Text>
+                        </TouchableOpacity>
+                </View>
+          
+
     );
 };
 
@@ -66,14 +86,14 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 20,
         marginTop: 30,
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        position: 'relative',
-        paddingBottom: 50
     },
     restaurantContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
+        
+    },
+    restaurantContainer2: {
+        width: '40%'
     },
     logoRes: {
         width: 80,
@@ -86,13 +106,39 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 5,
         marginBottom: 10,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+       
 
     },
     selectedTables: {
         marginLeft: 20,
         marginTop: 5,
     },
+    button: {
+        backgroundColor: '#FF914D',
+        width: '35%',
+        padding: 10,
+        borderRadius: 5,
+        alignSelf:'flex-end',
+    },
+    buttonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontWeight:'bold'
+    },
+    buttonReserve:{
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: '#FF914D',
+        padding: 10,
+        borderRadius: 5,
+        alignSelf:'center',
+        width: '100%',
+    },
+    rq:{
+        marginTop: 10,
+        marginLeft:10
+    }
 });
 
 export default ReservationScreen;

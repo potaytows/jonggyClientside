@@ -6,34 +6,38 @@ const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
 const PasswordResetScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [emailNotFound, setEmailNotFound] = useState(false);
 
   const handleSendOTP = async () => {
     try {
       const response = await axios.post(`${apiheader}/users/forgotPassword`, { email });
       
       if (response.data.status === 'success') {
-        Alert.alert('Success', 'Reset link sent to user email');
+        Alert.alert('Success', 'ส่ง OTP ไปยังเมล '+ email +' แล้ว');
         navigation.navigate('OTPVerification', { email });
-
       } else {
-        Alert.alert('Error', 'Failed to send reset link. Please try again.');
+        setEmailNotFound(true);
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to send reset link. Please try again.');
+      setEmailNotFound(true);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text>กรุณากรอกที่อยู่อีเมลเพื่อรับ OTP</Text>
+      <Text style={styles.textTop}>กรุณากรอกที่อยู่อีเมลเพื่อรับ OTP</Text>
       <TextInput
         placeholder="ที่อยู่อีเมล"
         placeholderTextColor="gray"
-        style={styles.input}
+        style={[styles.input, emailNotFound && styles.inputError]}
         value={email}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => {
+          setEmail(text);
+          setEmailNotFound(false); 
+        }}
       />
+      {emailNotFound && <Text style={styles.errorText}>ไม่พบอีเมลดังกล่าว</Text>}
       <TouchableOpacity style={styles.button} onPress={handleSendOTP}>
         <Text style={styles.buttonText}>ส่ง OTP</Text>
       </TouchableOpacity>
@@ -46,17 +50,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#2F2F2F',
+  },
+  textTop: {
+    color: 'white',
   },
   input: {
     borderWidth: 1,
-    color: 'black',
-    borderColor: 'gray',
+    color: 'white',
+    borderColor: '#FF914D',
     borderRadius: 5,
     width: '80%',
     padding: 10,
     marginBottom: 10,
     alignSelf: 'center',
     marginTop: 10,
+  },
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#FF914D',

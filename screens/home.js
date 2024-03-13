@@ -70,10 +70,6 @@ const HomeScreen = ({navigation}) => {
           
           
           {restaurants != undefined ? restaurants.map((item, index) => (
-            restaurants && index == undefined ?(
-              <View><Text>ไม่พบร้านอาหาร</Text></View>
-
-            ):(
               <TouchableOpacity
               onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id ,restaurantName:item.restaurantName})}
         key={item._id}
@@ -89,7 +85,7 @@ const HomeScreen = ({navigation}) => {
 
             )
 
-          )):<View><Text>กำลังโหลดข้อมูล!</Text></View>}
+          ):<View><Text>กำลังโหลดข้อมูล!</Text></View>}
 
 
         </View>

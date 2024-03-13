@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert,Pressable} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Pressable } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -12,6 +13,9 @@ const RegisterScreen = ({ navigation }) => {
   const [birthday, setBirthday] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isPhoneNumberValid, setPhoneNumberValid] = useState(true);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -23,9 +27,28 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleConfirm = (selectedDate) => {
     hideDatePicker();
+    let dateTimeString =
+    selectedDate.getDate() +
+    '-' +
+    (selectedDate.getMonth() + 1) +
+    '-' +
+    selectedDate.getFullYear()
     if (selectedDate) {
-      setBirthday(selectedDate.toDateString());
+      setBirthday(dateTimeString);
     }
+  };
+  
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const validatePhoneNumber = (text) => {
+    const isValid = /^\d{10}$/.test(text);
+    setPhoneNumberValid(isValid);
   };
 
 
@@ -72,32 +95,50 @@ const RegisterScreen = ({ navigation }) => {
           value={username}
           onChangeText={text => setUsername(text)}
         />
-
         <Text style={styles.inputs}>รหัสผ่าน</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={text => setPassword(text)}
-          secureTextEntry
-        />
-        <Text style={styles.inputs}>ยืนยันรหัสผ่าน</Text>
-        <TextInput
-          style={styles.input}
-          value={confirmPassword}
-          onChangeText={text => setConfirmPassword(text)}
-          secureTextEntry
-        />
-        <Text style={styles.inputs}>วัน/เดือน/ปี เกิด</Text>
-      
-          <Pressable onPress={showDatePicker}>
-            <TextInput
-              placeholderTextColor="gray"
-              style={styles.input}
-              value={birthday}
-              onChangeText={text => setBirthday(text)}
-              editable={false}
+        <View style={styles.passwordInputContainer}>
+          <TextInput
+            style={styles.inputWithIcon}
+            value={password}
+            onChangeText={text => setPassword(text)}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={toggleShowPassword} style={styles.iconContainer}>
+            <Ionicons
+              name={showPassword ? 'eye' : 'eye-off'}
+              size={24}
+              color="#FF914D"
             />
-          </Pressable>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.inputs}>ยืนยันรหัสผ่าน</Text>
+        <View style={styles.passwordInputContainer}>
+          <TextInput
+            style={styles.inputWithIcon}
+            value={confirmPassword}
+            onChangeText={text => setConfirmPassword(text)}
+            secureTextEntry={!showConfirmPassword}
+          />
+          <TouchableOpacity onPress={toggleShowConfirmPassword} style={styles.iconContainer}>
+            <Ionicons
+              name={showConfirmPassword ? 'eye' : 'eye-off'}
+              size={24}
+              color="#FF914D"
+            />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.inputs}>วัน/เดือน/ปี เกิด</Text>
+
+        <Pressable onPress={showDatePicker}>
+          <TextInput
+            placeholderTextColor="gray"
+            style={styles.input}
+            value={birthday}
+            onChangeText={text => setBirthday(text)}
+            editable={false}
+          />
+        </Pressable>
 
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
@@ -114,13 +155,19 @@ const RegisterScreen = ({ navigation }) => {
         />
         <Text style={styles.inputs}>เบอร์โทรศัพท์</Text>
         <TextInput
-
-          style={styles.input}
+          style={[styles.input, !isPhoneNumberValid && styles.invalidInput]}
           value={phonenumber}
-          onChangeText={text => setPhonenumber(text)}
+          onChangeText={(text) => {
+            setPhonenumber(text);
+            validatePhoneNumber(text);
+          }}
         />
 
-        <TouchableOpacity style={styles.button} onPress={fetchaddUser}>
+<TouchableOpacity
+          style={[styles.button, !isPhoneNumberValid && styles.disabledButton]}
+          onPress={fetchaddUser}
+          disabled={!isPhoneNumberValid}
+        >
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
@@ -133,8 +180,30 @@ const styles = StyleSheet.create({
   inputs: {
     marginLeft: 45,
     color: '#FF914D',
-    marginBottom: 5
+    marginBottom: 5,
+    
 
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  inputWithIcon: {
+    flex: 1,
+    borderWidth: 1,
+    color: 'white',
+    borderColor: '#FF914D',
+    borderRadius: 5,
+    padding: 10,
+  },
+  iconContainer: {
+    padding: 10,
+    position: 'absolute',
+    right: 0,
   },
 
   container: {
@@ -177,6 +246,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     textAlign: 'center',
+  },
+  invalidInput: {
+    borderColor: 'red',
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
   },
 
 });

@@ -12,7 +12,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleEditProfile = () => {
     navigation.navigate('EditProfile', { userInfo });
-  }; 
+  };
 
 
   const checkLoginStatus = async () => {
@@ -33,13 +33,13 @@ const ProfileScreen = ({ navigation }) => {
     React.useCallback(() => {
       checkLoginStatus();
     }, [])
-);
+  );
 
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
         <HeaderBackButton
-          onPress={() => {}}
+          onPress={() => { }}
           disabled={true}
         />
       ),
@@ -60,16 +60,19 @@ const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {isLoggedIn ? (
-         <View>
-           <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
-           <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
-        </TouchableOpacity>
-         <Button title="ออกจากระบบ" onPress={handleLogout} />
-       </View>
+        <View>
+          <TouchableOpacity onPress={handleEditProfile}>
+            <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleLogout}>
+            <Text style={styles.textbutton}>ออกจากระบบ</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
-       
-        <Button title="เข้าสู่ระบบ" onPress={() => navigation.navigate('Login')} />
 
+        <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.textbuttons}>เข้าสู่ระบบ</Text>
+          </TouchableOpacity>
       )}
     </View>
   );
@@ -80,6 +83,29 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  button: {
+    width: '40%',
+    marginTop: 20,
+    alignSelf: 'center',
+    borderRadius: 5
+  },
+  buttons: {
+    width: '40%',
+    backgroundColor:'#FF914D',
+    padding:10,
+    marginTop: 20,
+    alignSelf: 'center',
+    borderRadius: 5
+  },
+  textbutton: {
+    color: 'red',
+    textAlign: 'center',
+    textDecorationLine:'underline'
+  },
+  textbuttons: {
+    color: 'white',
+    textAlign: 'center',
   },
 });
 
