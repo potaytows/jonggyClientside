@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity,Image } from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,7 +21,6 @@ const ProfileScreen = ({ navigation }) => {
 
       if (userCredentials) {
         setIsLoggedIn(true);
-        // Decode user information (assuming it's stored as a JSON string)
         const user = JSON.parse(userCredentials);
         setUserInfo(user);
       }
@@ -52,6 +51,7 @@ const ProfileScreen = ({ navigation }) => {
       setIsLoggedIn(false);
       setUserInfo(null);
       navigation.navigate('Login');
+      
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -69,10 +69,14 @@ const ProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       ) : (
-
+        <View>
+          <Image style={styles.Logo}
+                source={require('../assets/images/Jonggylogo.png')}
+            />
         <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.textbuttons}>เข้าสู่ระบบ</Text>
           </TouchableOpacity>
+          </View>
       )}
     </View>
   );
@@ -107,6 +111,10 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
   },
+  Logo: {
+    width: 200,
+    height: 200
+},
 });
 
 export default ProfileScreen;

@@ -5,10 +5,20 @@ import { useRoute } from '@react-navigation/native';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const MenuList = ({ route }) => {
+const MenuList = ({ route ,navigation }) => {
     const [menuItems, setMenuItems] = useState([]);
     const [selectedTables, setSelectedTables] = useState([]);
 
+    const handleSetAddon = (selectedMenuItem) => {
+        navigation.navigate('menuAddon', { 
+            restaurantId: route.params.restaurantId,
+            navigationSource: route.params.navigationSource,
+            selectedMenuItem: selectedMenuItem,
+            selectedTables: selectedTables,
+
+        });
+
+    };
 
 
     const fetchMenuItems = async () => {
@@ -32,17 +42,17 @@ const MenuList = ({ route }) => {
         <View style={styles.container}>
             <View style={styles.header}>
                 <Image style={styles.backgroundImage} source={require('../assets/images/profile.png')} />
-               
+
             </View>
             {route.params.navigationSource === 'OrderTogether' ? (
-            <Text style={styles.selectedTablesText}>รวมโต๊ะ</Text>
+                <Text style={styles.selectedTablesText}>รวมโต๊ะ</Text>
             ) : null}
             {route.params.navigationSource === 'ChooseTable' ? (
 
-            <Text style={styles.selectedTablesText}>
-                โต๊ะ {selectedTables.map((table) => table.tableName).join(', ')}
-            </Text>
- ) : null}
+                <Text style={styles.selectedTablesText}>
+                    โต๊ะ {selectedTables.map((table) => table.tableName).join(', ')}
+                </Text>
+            ) : null}
 
             {menuItems.length === 0 && (
                 <View style={styles.noResultsContainer}>
@@ -60,7 +70,7 @@ const MenuList = ({ route }) => {
 
                     ) : (
                         <TouchableOpacity style={styles.menubox}
-                            // onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                        onPress={() => handleSetAddon(item)}
                             key={item._id}
                         >
                             <View style={styles.card}>
@@ -120,11 +130,12 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent:'center',
+        justifyContent: 'center',
 
     },
     backgroundImage: {
-        width: '100%'
+        width: '100%',
+        height: "100%"
     },
     noResultsContainer: {
         flex: 1,
@@ -137,11 +148,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'gray',
     },
-    selectedTablesText:{
-        textAlign:'center',
-        marginTop:15,
-        fontSize:18,
-        fontWeight:'bold'
+    selectedTablesText: {
+        textAlign: 'center',
+        marginTop: 15,
+        fontSize: 18,
+        fontWeight: 'bold'
     }
 });
 

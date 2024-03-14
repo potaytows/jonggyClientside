@@ -16,6 +16,7 @@ import OTPVerificationScreen from './screens/verifyOTP';
 import MenuTableScreen from './screens/menuTable';
 import MenuListScreen from './screens/menuList';
 import MenuChooseTableScreen from './screens/menuChooseTable';
+import MenuAddonScreen from './screens/menuAddon';
 
 
 const Stack = createStackNavigator();
@@ -62,6 +63,8 @@ const App=()=> {
         <Stack.Screen name='menuTable' component={MenuTableScreen}  />
         <Stack.Screen name='menuList' component={MenuListScreen}  />
         <Stack.Screen name='chooseTable' component={MenuChooseTableScreen}  />
+        <Stack.Screen name='menuAddon' component={MenuAddonScreen}  />
+
 
 
 

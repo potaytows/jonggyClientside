@@ -4,6 +4,8 @@ import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image'
 import _ from 'lodash';
+import * as SecureStore from 'expo-secure-store';
+
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -13,14 +15,35 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   const [selected, setSelected] = useState([]);
   const [request, setRequest] = useState('');
   const [restaurantDetails, setRestaurantDetails] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+
+  const checkLoginStatus = async () => {
+    try {
+      const userCredentials = await SecureStore.getItemAsync('userCredentials');
+
+      if (userCredentials) {
+        setIsLoggedIn(true);
+        const user = JSON.parse(userCredentials);
+        setUserInfo(user);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  };
 
   const handlecomplete = () => {
-    // ส่งข้อมูลไปยังหน้า ReservationScreen
-    navigation.navigate('reserve', {
-      restaurantId: route.params.restaurantId,
-      restaurantName: restaurantDetails.restaurantName,
-      selectedTables: selected
-    });
+    if (!isLoggedIn) {
+      navigation.navigate('profile'); 
+    } else {
+      navigation.navigate('reserve', {
+        restaurantId: route.params.restaurantId,
+        restaurantName: restaurantDetails.restaurantName,
+        selectedTables: selected
+      });
+      console.log(restaurantDetails)
+    }
   };
 
   function compareObjs(obj1, obj2) {
@@ -66,7 +89,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-
+    checkLoginStatus();
     getTables();
     fetchRestaurantDetails();
   }, []);
@@ -229,10 +252,12 @@ const styles = StyleSheet.create({
   dragablecontainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 350,
+    width: "100%",
     height: 450,
     alignSelf: 'center',
     marginVertical: 20,  
+    borderBottomColor:'gray',
+    borderBottomWidth:1
 
   },
   tablecontainer: {

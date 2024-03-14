@@ -30,6 +30,8 @@ const ReservationScreen = ({ navigation,route }) => {
         }
     };
 
+    
+
 
     useEffect(() => {
         fetchRestaurantDetails();
@@ -53,6 +55,8 @@ const ReservationScreen = ({ navigation,route }) => {
                         <View style={styles.restaurantContainer2}>
 
                             <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
+            
+
 
                             <Text style={styles.selectedTables}>โต๊ะที่เลือก:</Text>
                             <Text style={styles.selectedTables}>
