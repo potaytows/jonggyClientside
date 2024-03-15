@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity,Image } from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
@@ -10,13 +10,17 @@ const ProfileScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
 
+  const handleEditProfile = () => {
+    navigation.navigate('EditProfile', { userInfo });
+  };
+
+
   const checkLoginStatus = async () => {
     try {
       const userCredentials = await SecureStore.getItemAsync('userCredentials');
 
       if (userCredentials) {
         setIsLoggedIn(true);
-        // Decode user information (assuming it's stored as a JSON string)
         const user = JSON.parse(userCredentials);
         setUserInfo(user);
       }
@@ -28,13 +32,13 @@ const ProfileScreen = ({ navigation }) => {
     React.useCallback(() => {
       checkLoginStatus();
     }, [])
-);
+  );
 
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
         <HeaderBackButton
-          onPress={() => {}}
+          onPress={() => { }}
           disabled={true}
         />
       ),
@@ -47,6 +51,7 @@ const ProfileScreen = ({ navigation }) => {
       setIsLoggedIn(false);
       setUserInfo(null);
       navigation.navigate('Login');
+      
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -55,16 +60,23 @@ const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {isLoggedIn ? (
-         <View>
-         <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
-         <Text>อีเมล: {userInfo?.email}</Text>
-         <Text>เบอร์โทรศัพท์: {userInfo?.phonenumber}</Text>
-         <Button title="ออกจากระบบ" onPress={handleLogout} />
-       </View>
+        <View>
+          <TouchableOpacity onPress={handleEditProfile}>
+            <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleLogout}>
+            <Text style={styles.textbutton}>ออกจากระบบ</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
-       
-        <Button title="เข้าสู่ระบบ" onPress={() => navigation.navigate('Login')} />
-
+        <View>
+          <Image style={styles.Logo}
+                source={require('../assets/images/Jonggylogo.png')}
+            />
+        <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.textbuttons}>เข้าสู่ระบบ</Text>
+          </TouchableOpacity>
+          </View>
       )}
     </View>
   );
@@ -76,6 +88,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  button: {
+    width: '40%',
+    marginTop: 20,
+    alignSelf: 'center',
+    borderRadius: 5
+  },
+  buttons: {
+    width: '40%',
+    backgroundColor:'#FF914D',
+    padding:10,
+    marginTop: 20,
+    alignSelf: 'center',
+    borderRadius: 5
+  },
+  textbutton: {
+    color: 'red',
+    textAlign: 'center',
+    textDecorationLine:'underline'
+  },
+  textbuttons: {
+    color: 'white',
+    textAlign: 'center',
+  },
+  Logo: {
+    width: 200,
+    height: 200
+},
 });
 
 export default ProfileScreen;
