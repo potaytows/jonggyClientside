@@ -1,50 +1,89 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Pressable } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [birthday, setBirthday] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isPhoneNumberValid, setPhoneNumberValid] = useState(true);
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (selectedDate) => {
+    hideDatePicker();
+    let dateTimeString =
+    selectedDate.getDate() +
+    '-' +
+    (selectedDate.getMonth() + 1) +
+    '-' +
+    selectedDate.getFullYear()
+    if (selectedDate) {
+      setBirthday(dateTimeString);
+    }
+  };
   
-  const fetchaddUser = async ()=>{
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const validatePhoneNumber = (text) => {
+    const isValid = /^\d{10}$/.test(text);
+    setPhoneNumberValid(isValid);
+  };
+
+
+  const fetchaddUser = async () => {
 
     if (password !== confirmPassword) {
-        Alert.alert('', 'รหัสผ่านไม่ตรงกัน', [{ text: 'OK', onPress: () => { } }]);
-      } else {
-  
-        console.log('User registered successfully');
-        console.log('Username: ', username);
-        console.log('Email: ', email);
-        console.log('Password: ', password);
-        console.log('Birthday: ', birthday);
-        console.log('Phonenumber: ', phonenumber);
-  
-      }
-    try {
-        const fetchOptions={
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({username:username, email:email, password:password, birthday:birthday, phonenumber:phonenumber})
-        };
-        const response = await fetch(apiheader + '/users/addUser',fetchOptions);
-        const result = await response.json();
-        console.log(result);
+      Alert.alert('', 'รหัสผ่านไม่ตรงกัน', [{ text: 'OK', onPress: () => { } }]);
+    } else {
 
-        navigation.navigate('Login'); 
-        Alert.alert('', 'สมัครเสร็จสิ้น', [{ text: 'OK', onPress: () => {} }]);
+      console.log('User registered successfully');
+      console.log('Username: ', username);
+      console.log('Email: ', email);
+      console.log('Password: ', password);
+      console.log('Birthday: ', birthday);
+      console.log('Phonenumber: ', phonenumber);
+
+    }
+    try {
+      const fetchOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, email: email, password: password, birthday: birthday, phonenumber: phonenumber })
+      };
+      const response = await fetch(apiheader + '/users/addUser', fetchOptions);
+      const result = await response.json();
+      console.log(result);
+
+      navigation.navigate('Login');
+      Alert.alert('', 'สมัครเสร็จสิ้น', [{ text: 'OK', onPress: () => { } }]);
 
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
 
-}
+  }
 
   return (
     <View style={styles.container}>
@@ -56,30 +95,58 @@ const RegisterScreen = ({navigation}) => {
           value={username}
           onChangeText={text => setUsername(text)}
         />
-
         <Text style={styles.inputs}>รหัสผ่าน</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={text => setPassword(text)}
-          secureTextEntry
-        />
-        <Text style={styles.inputs}>ยืนยันรหัสผ่าน</Text>
-        <TextInput
-          style={styles.input}
-          value={confirmPassword}
-          onChangeText={text => setConfirmPassword(text)}
-          secureTextEntry
-        />
-        <Text style={styles.inputs}>วัน/เดือน/ปี เกิด</Text>
-        <TextInput
-        placeholder='วว/ดด/ปป'
-        placeholderTextColor="gray"
-          style={styles.input}
-          value={birthday}
-          onChangeText={text => setBirthday(text)}
-        />
+        <View style={styles.passwordInputContainer}>
+          <TextInput
+            style={styles.inputWithIcon}
+            value={password}
+            onChangeText={text => setPassword(text)}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={toggleShowPassword} style={styles.iconContainer}>
+            <Ionicons
+              name={showPassword ? 'eye' : 'eye-off'}
+              size={24}
+              color="#FF914D"
+            />
+          </TouchableOpacity>
+        </View>
 
+        <Text style={styles.inputs}>ยืนยันรหัสผ่าน</Text>
+        <View style={styles.passwordInputContainer}>
+          <TextInput
+            style={styles.inputWithIcon}
+            value={confirmPassword}
+            onChangeText={text => setConfirmPassword(text)}
+            secureTextEntry={!showConfirmPassword}
+          />
+          <TouchableOpacity onPress={toggleShowConfirmPassword} style={styles.iconContainer}>
+            <Ionicons
+              name={showConfirmPassword ? 'eye' : 'eye-off'}
+              size={24}
+              color="#FF914D"
+            />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.inputs}>วัน/เดือน/ปี เกิด</Text>
+
+        <Pressable onPress={showDatePicker}>
+          <TextInput
+            placeholderTextColor="gray"
+            style={styles.input}
+            value={birthday}
+            onChangeText={text => setBirthday(text)}
+            editable={false}
+          />
+        </Pressable>
+
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          locale="th"
+        />
         <Text style={styles.inputs}>อีเมล์</Text>
         <TextInput
           style={styles.input}
@@ -88,13 +155,19 @@ const RegisterScreen = ({navigation}) => {
         />
         <Text style={styles.inputs}>เบอร์โทรศัพท์</Text>
         <TextInput
-        
-          style={styles.input}
+          style={[styles.input, !isPhoneNumberValid && styles.invalidInput]}
           value={phonenumber}
-          onChangeText={text => setPhonenumber(text)}
+          onChangeText={(text) => {
+            setPhonenumber(text);
+            validatePhoneNumber(text);
+          }}
         />
 
-        <TouchableOpacity style={styles.button} onPress={fetchaddUser}>
+<TouchableOpacity
+          style={[styles.button, !isPhoneNumberValid && styles.disabledButton]}
+          onPress={fetchaddUser}
+          disabled={!isPhoneNumberValid}
+        >
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
@@ -105,10 +178,32 @@ const RegisterScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   inputs: {
-    marginLeft: 45, 
+    marginLeft: 45,
     color: '#FF914D',
-    marginBottom: 5
+    marginBottom: 5,
+    
 
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  inputWithIcon: {
+    flex: 1,
+    borderWidth: 1,
+    color: 'white',
+    borderColor: '#FF914D',
+    borderRadius: 5,
+    padding: 10,
+  },
+  iconContainer: {
+    padding: 10,
+    position: 'absolute',
+    right: 0,
   },
 
   container: {
@@ -125,7 +220,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color:'#F66060'
+    color: '#F66060'
 
   },
   input: {
@@ -151,6 +246,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     textAlign: 'center',
+  },
+  invalidInput: {
+    borderColor: 'red',
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
   },
 
 });
