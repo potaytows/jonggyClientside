@@ -69,7 +69,7 @@ const RestaurantDetailScreen = ({ route }) => {
     );
   }
 
-  const TableComponent = (props) => {
+  const TableComponent  = (props) => {
     const item = props.item
     if (contains(selected,item)) {
       return (
@@ -91,7 +91,6 @@ const RestaurantDetailScreen = ({ route }) => {
             </View>
           </View>
         </TouchableOpacity>
-
       )
     }else{
       return (
@@ -105,19 +104,13 @@ const RestaurantDetailScreen = ({ route }) => {
                   source={require('../assets/images/table.png')}
                   borderRadius={5}
                 />
-
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
           </View>
         </TouchableOpacity>
-
       )
-
     }
-
-
-
   }
 
   return (
@@ -158,9 +151,7 @@ const styles = StyleSheet.create({
     margin: 20,
     marginTop: 30,
     flexDirection: 'column',
-    alignItems: 'stretch',
-    position: 'relative',
-    paddingBottom: 50
+    paddingBottom: 50,
   },
   restaurantContainer: {
     flexDirection: 'row',
@@ -208,7 +199,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 20,
     borderColor: 'black',
-    borderWidth: 1
+    borderWidth: 1,
   },
   tablecontainer: {
     borderRadius: 8,
@@ -217,7 +208,8 @@ const styles = StyleSheet.create({
   }, dragablecontent: {
     position: 'absolute',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    alignSelf:'center'
   }
 });
 
