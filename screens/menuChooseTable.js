@@ -22,8 +22,7 @@ const MenuChooseTableScreen = ({ route, navigation }) => {
     }, []);
 
     return (
-        <View>
-            <ScrollView>
+            <ScrollView style={styles.container} >
                 <View style={styles.container}>
                     <View style={styles.restaurantContainer}>
                         {selectedTables.map((item, index) => (
@@ -38,19 +37,24 @@ const MenuChooseTableScreen = ({ route, navigation }) => {
                     </View>
                 </View>
             </ScrollView>
-        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        margin: 20,
+        backgroundColor:'white'
+
     },
     restaurantContainer: {
         flex: 1,
+        margin: 20,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        
+
+       
+
     },
     button: {
         backgroundColor: '#FF914D',

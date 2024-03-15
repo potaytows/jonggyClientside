@@ -36,8 +36,7 @@ const MenuTableScreen = ({route, navigation  }) => {
     
 
     return (
-        <View>
-            <ScrollView>
+            <ScrollView style={styles.container}>
                 <View style={styles.container}>
                     <View style={styles.restaurantContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleOrderTogether}>
@@ -51,19 +50,21 @@ const MenuTableScreen = ({route, navigation  }) => {
                 </View>
 
             </ScrollView>
-        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        margin: 20,
+        backgroundColor:'white'
+
     },
     restaurantContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        margin: 20,
+
     },
     button: {
         backgroundColor: '#FF914D',

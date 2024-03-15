@@ -96,6 +96,8 @@ const MenuList = ({ route ,navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor:'white'
+
     },
     menubox: {
         marginLeft: 15,
@@ -131,6 +133,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
+        backgroundColor:'white'
+
 
     },
     backgroundImage: {

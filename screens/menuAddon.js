@@ -6,11 +6,13 @@ import Checkbox from 'expo-checkbox';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const MenuAddonScreen = ({ route }) => {
+const MenuAddonScreen = ({ route ,navigation}) => {
     const [selectedTables, setSelectedTables] = useState([]);
     const [selectedMenuItem, setSelectedMenuItem] = useState(null);
     const [addons, setAddons] = useState([]);
-    const [isChecked, setChecked] = useState(false);
+    const [checkedItems, setCheckedItems] = useState(Array(addons.length).fill(false));
+    const [queueCount, setQueueCount] = useState(0);
+
 
     const fetchAddons = async () => {
         try {
@@ -23,7 +25,6 @@ const MenuAddonScreen = ({ route }) => {
         }
     };
 
-
     useEffect(() => {
         setSelectedMenuItem(route.params.selectedMenuItem);
         setSelectedTables(route.params.selectedTables || []);
@@ -35,6 +36,20 @@ const MenuAddonScreen = ({ route }) => {
 
         }
     }, [selectedMenuItem]);
+
+
+    const handleCheckboxChange = (index) => {
+        const newCheckedItems = [...checkedItems];
+        newCheckedItems[index] = !newCheckedItems[index];
+        setCheckedItems(newCheckedItems);
+    };
+     const handleAddToCart = async () => {
+        try {
+            setQueueCount(queueCount + 1);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
 
     return (
@@ -57,28 +72,28 @@ const MenuAddonScreen = ({ route }) => {
                     <View style={styles.menuContainer}>
                         <View style={styles.menuShow}>
                             <View style={styles.TextContaine}>
-                            <Text style={styles.menuName}>{selectedMenuItem.menuName}</Text>
+                                <Text style={styles.menuName}>{selectedMenuItem.menuName}</Text>
                             </View>
                             <View style={styles.TextContaine}>
-                            <Text style={styles.price}>{selectedMenuItem.price}</Text>
-                            <Text style={styles.pricestart}>ราคาเริ่มต้น</Text>
+                                <Text style={styles.price}>{selectedMenuItem.price}</Text>
+                                <Text style={styles.pricestart}>ราคาเริ่มต้น</Text>
 
                             </View>
                         </View>
                         <Text style={styles.addons}>เพิ่มเติม</Text>
-                        {addons && addons.map((addon) => (
+                        {addons && addons.map((addon, index) => (
                             <View key={addon._id} style={styles.section}>
-                                
+
                                 <View style={styles.TextContaineFlex}>
                                     <Checkbox
-                                    style={styles.checkbox}
-                                    value={isChecked}
-                                    onValueChange={setChecked}
-                                />
-                                <Text style={styles.paragraph}>{addon.AddOnName}</Text>
+                                        style={styles.checkbox}
+                                        value={checkedItems[index]}
+                                        onValueChange={() => handleCheckboxChange(index)}
+                                    />
+                                    <Text style={styles.paragraph}>{addon.AddOnName}</Text>
                                 </View>
                                 <View style={styles.TextContaine}>
-                                <Text style={styles.paragraph2}>+{addon.price}</Text>
+                                    <Text style={styles.paragraph2}>+{addon.price}</Text>
                                 </View>
                             </View>
                         ))}
@@ -86,8 +101,9 @@ const MenuAddonScreen = ({ route }) => {
                 )}
             </View>
             <TouchableOpacity style={styles.buttonReserve}>
-                            <Text style={styles.buttonText}>เพิ่มในตระกร้า</Text>
-                        </TouchableOpacity>
+                <Text style={styles.buttonText}>เพิ่มในตระกร้า</Text>
+            </TouchableOpacity>
+            <Text style={styles.queueCountText}>รายการรอคิว: {queueCount}</Text>
         </View>
     );
 };
@@ -95,6 +111,7 @@ const MenuAddonScreen = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: 'white'
     },
     header: {
         width: '100%',
@@ -115,26 +132,26 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    TextContaine:{
+    TextContaine: {
         width: '50%',
     },
-    TextContaineFlex:{
+    TextContaineFlex: {
         width: '50%',
         fontSize: 15,
         flexDirection: 'row',
-        
+
     },
     menuName: {
         fontSize: 20,
         marginBottom: 8,
-        marginLeft:15
+        marginLeft: 15
     },
     price: {
         fontSize: 25,
         color: '#FF66AB',
         fontWeight: 'bold',
         textAlign: 'right',
-        marginRight:15
+        marginRight: 15
 
 
     },
@@ -143,9 +160,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         marginTop: 10,
-        borderBottomColor:'#DDDDDD',
-        borderBottomWidth:1
-        
+        borderBottomColor: '#DDDDDD',
+        borderBottomWidth: 1
+
     },
     menuContainer: {
         width: '100%',
@@ -154,50 +171,50 @@ const styles = StyleSheet.create({
     menuShow: {
         width: '100%',
         flexDirection: 'row',
-        borderBottomWidth:5,
+        borderBottomWidth: 5,
         borderBottomColor: '#E2E2E2',
     },
-    addons:{
-        marginLeft:15,
-        fontSize:16,
-        fontWeight:'bold',
-        marginTop:10
+    addons: {
+        marginLeft: 15,
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10
 
     },
-    paragraph:{
-        marginLeft:10
+    paragraph: {
+        marginLeft: 10
     },
     paragraph2: {
         fontSize: 15,
         textAlign: 'right',
-        marginRight:15
+        marginRight: 15
     },
     checkbox: {
         borderRadius: 50,
-        marginLeft:15,
-        marginBottom:10
+        marginLeft: 15,
+        marginBottom: 10
     },
-    pricestart:{
+    pricestart: {
         textAlign: 'right',
-        marginRight:15,
-        marginBottom:10
+        marginRight: 15,
+        marginBottom: 10
 
     },
     buttonText: {
         color: 'white',
         textAlign: 'center',
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
-    buttonReserve:{
+    buttonReserve: {
         position: 'absolute',
         bottom: 0,
         backgroundColor: '#FF914D',
         padding: 10,
         borderRadius: 5,
-        alignSelf:'center',
+        alignSelf: 'center',
         width: '95%',
-        marginBottom:10
-        
+        marginBottom: 10
+
     },
 });
 

@@ -74,7 +74,17 @@ const ReservationScreen = ({ navigation,route }) => {
 
                     </View>
                     <Text style={styles.rq}>ความต้องการเพิ่มเติม</Text>
+                    {/* <View>
+                    {route.params.navigationSource === 'OrderTogether' ? (
+                <Text style={styles.selectedTablesText}>รวมโต๊ะ</Text>
+            ) : null}
+            {route.params.navigationSource === 'ChooseTable' ? (
 
+                <Text style={styles.selectedTablesText}>
+                    โต๊ะ {selectedTables.map((table) => table.tableName).join(', ')}
+                </Text>
+            ) : null}
+            </View> */}
             </ScrollView>
             <TouchableOpacity style={styles.buttonReserve}>
                             <Text style={styles.buttonText}>ยืนยันการจอง</Text>
@@ -88,11 +98,13 @@ const ReservationScreen = ({ navigation,route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        margin: 20,
-        marginTop: 30,
+        backgroundColor:'white'
+
     },
     restaurantContainer: {
         flexDirection: 'row',
+        margin: 20,
+        marginTop: 30,
         alignItems: 'flex-start',
         
     },
@@ -137,11 +149,12 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         alignSelf:'center',
-        width: '100%',
+        width: '95%',
+        marginBottom:15
     },
     rq:{
         marginTop: 10,
-        marginLeft:10
+        marginLeft:25
     }
 });
 
