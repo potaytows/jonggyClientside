@@ -4,27 +4,59 @@ import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image'
 import _ from 'lodash';
+import * as SecureStore from 'expo-secure-store';
+
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const RestaurantDetailScreen = ({ route }) => {
+const RestaurantDetailScreen = ({ route, navigation }) => {
   const [obj, setData] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [phonenumber, setPhonenumber] = useState('');
+  const [request, setRequest] = useState('');
   const [restaurantDetails, setRestaurantDetails] = useState(null);
-  
-  function compareObjs(obj1,obj2){
-    return JSON.stringify(obj1)===JSON.stringify(obj2);
-}
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+
+  const checkLoginStatus = async () => {
+    try {
+      const userCredentials = await SecureStore.getItemAsync('userCredentials');
+
+      if (userCredentials) {
+        setIsLoggedIn(true);
+        const user = JSON.parse(userCredentials);
+        setUserInfo(user);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  };
+
+  const handlecomplete = () => {
+    if (!isLoggedIn) {
+      navigation.navigate('profile'); 
+    } else {
+      navigation.navigate('reserve', {
+        restaurantId: route.params.restaurantId,
+        restaurantName: restaurantDetails.restaurantName,
+        selectedTables: selected
+      });
+      console.log(restaurantDetails)
+    }
+  };
+
+  function compareObjs(obj1, obj2) {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
   const contains = (arr, val) => {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] === val) {
-            return true;
-        }
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === val) {
+        return true;
+      }
     }
 
-      return false;
+    return false;
 
   }
   const addSelected = (val) => {
@@ -57,7 +89,7 @@ const RestaurantDetailScreen = ({ route }) => {
   };
 
   useEffect(() => {
-
+    checkLoginStatus();
     getTables();
     fetchRestaurantDetails();
   }, []);
@@ -71,7 +103,7 @@ const RestaurantDetailScreen = ({ route }) => {
 
   const TableComponent  = (props) => {
     const item = props.item
-    if (contains(selected,item)) {
+    if (contains(selected, item)) {
       return (
         <TouchableOpacity onPress={() => removeSelected(item)}>
           <View style={styles.dragablecontent}>
@@ -92,7 +124,7 @@ const RestaurantDetailScreen = ({ route }) => {
           </View>
         </TouchableOpacity>
       )
-    }else{
+    } else {
       return (
         <TouchableOpacity onPress={() => addSelected(item)}>
           <View style={styles.dragablecontent}>
@@ -124,21 +156,33 @@ const RestaurantDetailScreen = ({ route }) => {
           </View>
           <View style={styles.dragablecontainer}>
             {obj.map((item, index) => (
-              <TableComponent item={item} key={index}/>
+              <TableComponent item={item} key={index} />
             ))}
           </View>
-          <Text style={styles.help}>ความต้องการเพิ่มเติม</Text>
-          <TextInput
-            style={styles.input}
-            value={phonenumber}
-            onChangeText={text => setPhonenumber(text)}
-          />
-
+          <View style={styles.requestContainer} >
+            <Text style={styles.help}>ความต้องการเพิ่มเติม</Text>
+            <TextInput
+              style={styles.input}
+              value={request}
+              onChangeText={text => setRequest(text)}
+            />
+          </View>
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.reserveButton} >
-        <Text style={styles.reserveButtonText}>ยืนยันการจอง</Text>
-      </TouchableOpacity>
+      <View style={styles.viewshow} >
+        <Text style={styles.showtable}>
+          โต๊ะที่เลือก: {selected.map((item, index) => (
+            index == selected.length - 1 ? (
+              <Text key={index} >{item.tableName}</Text>
+            ) : (<Text key={index} >{item.tableName}, </Text>)
+
+          ))}
+        </Text>
+
+        <TouchableOpacity style={styles.reserveButton} onPress={handlecomplete} >
+          <Text style={styles.reserveButtonText}>ยืนยันการจอง</Text>
+        </TouchableOpacity>
+      </View>
     </View>
 
 
@@ -148,14 +192,22 @@ const RestaurantDetailScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
-    marginTop: 30,
+    backgroundColor:'#F0F0F0',
     flexDirection: 'column',
-    paddingBottom: 50,
+    alignItems: 'stretch',
+    position: 'relative',
+    paddingBottom: 50
   },
   restaurantContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginLeft:20,
+    
+    marginTop: 30,
+  },
+  requestContainer:{
+    marginLeft: 20,
+
   },
   logoRes: {
     width: 80,
@@ -187,6 +239,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#fff',
     width: '70%',
+    marginBottom: '20%'
   },
   help: {
     marginTop: 20
@@ -194,22 +247,22 @@ const styles = StyleSheet.create({
   dragablecontainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 350,
+    width: "100%",
     height: 450,
     alignSelf: 'center',
     marginVertical: 20,
     borderColor: 'black',
-    borderWidth: 1,
+    borderWidth: 1
   },
   tablecontainer: {
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  }, dragablecontent: {
+  }, 
+  dragablecontent: {
     position: 'absolute',
     justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf:'center'
+    alignItems: 'center'
   }
 });
 
