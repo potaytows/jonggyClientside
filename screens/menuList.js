@@ -9,13 +9,14 @@ const MenuList = ({ route ,navigation }) => {
     const [menuItems, setMenuItems] = useState([]);
     const [selectedTables, setSelectedTables] = useState([]);
 
+
     const handleSetAddon = (selectedMenuItem) => {
         navigation.navigate('menuAddon', { 
             restaurantId: route.params.restaurantId,
             navigationSource: route.params.navigationSource,
             selectedMenuItem: selectedMenuItem,
             selectedTables: selectedTables,
-
+           
         });
 
     };
@@ -30,7 +31,6 @@ const MenuList = ({ route ,navigation }) => {
             console.error(error);
         }
     };
-
     useEffect(() => {
         fetchMenuItems();
         setSelectedTables(route.params.selectedTables || []);
