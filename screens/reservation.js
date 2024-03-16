@@ -51,9 +51,9 @@ const ReservationScreen = ({ navigation, route }) => {
             console.error(error);
         }
     };
-    const fetchDeleteCart = async () => {
+    const fetchDeleteCart = async (id) => {
         try {
-            const response = await axios.get(apiheader + '/cart/deleteCart/' + cartItems._id);
+            const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
             const result = await response.data;
             fetchCart();
         } catch (error) {
@@ -144,7 +144,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                             <Text style={styles.Ui} >{item.selectedMenuItem.price}</Text>
                                         </View>
                                         <View style={styles.MenuLi4}>
-                                            <TouchableOpacity>
+                                            <TouchableOpacity  onPress={()=>{fetchDeleteCart(item._id)}}>
                                                 <Text style={styles.Delete}>ลบ</Text>
                                             </TouchableOpacity>
                                         </View>
@@ -157,7 +157,7 @@ const ReservationScreen = ({ navigation, route }) => {
                 </View>
             </ScrollView>
 
-            <TouchableOpacity style={styles.buttonReserve} onPress={fetchDeleteCart}>
+            <TouchableOpacity style={styles.buttonReserve}>
                 <Text style={styles.buttonText}>ยืนยันการจอง</Text>
             </TouchableOpacity>
         </View>
