@@ -63,12 +63,7 @@ const MenuList = ({ route ,navigation }) => {
 
             )}
             <View style={styles.restaurantListContainer}>
-
-                {menuItems != undefined ? menuItems.map((item, index) => (
-                    menuItems == undefined && index == undefined ? (
-                        <View><Text>ไม่พบร้านอาหาร</Text></View>
-
-                    ) : (
+            {menuItems && menuItems.map((item, index) => (
                         <TouchableOpacity style={styles.menubox}
                         onPress={() => handleSetAddon(item)}
                             key={item._id}
@@ -81,12 +76,7 @@ const MenuList = ({ route ,navigation }) => {
                                 </View>
                             </View>
                         </TouchableOpacity>
-
-                    )
-
-                )) : <View style={styles.noResultsContainer}>
-                    <Text style={styles.noResultsText} >กำลังโหลดข้อมูล!</Text>
-                </View>}
+                        ))}
             </View>
 
         </View>
