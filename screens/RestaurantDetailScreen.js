@@ -101,7 +101,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     );
   }
 
-  const TableComponent = (props) => {
+  const TableComponent  = (props) => {
     const item = props.item
     if (contains(selected, item)) {
       return (
@@ -123,7 +123,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
             </View>
           </View>
         </TouchableOpacity>
-
       )
     } else {
       return (
@@ -137,19 +136,13 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
                   source={require('../assets/images/table.png')}
                   borderRadius={5}
                 />
-
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
           </View>
         </TouchableOpacity>
-
       )
-
     }
-
-
-
   }
 
   return (
@@ -201,6 +194,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor:'#F0F0F0',
     flexDirection: 'column',
+    alignItems: 'stretch',
+    position: 'relative',
     paddingBottom: 50
   },
   restaurantContainer: {
@@ -255,10 +250,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 450,
     alignSelf: 'center',
-    marginVertical: 20,  
-    borderBottomColor:'gray',
-    borderBottomWidth:1
-
+    marginVertical: 20,
+    borderColor: 'black',
+    borderWidth: 1
   },
   tablecontainer: {
     borderRadius: 8,
@@ -267,23 +261,8 @@ const styles = StyleSheet.create({
   }, 
   dragablecontent: {
     position: 'absolute',
-    justifyContent: 'center', 
-    alignSelf: 'center'
-    
-  },
-  viewshow: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: 'white',
-    height: '15%',
-    width: '100%',
-    borderTopWidth: 2,
-    borderTopColor: '#E6E6E6'
-  },
-  showtable: {
-    marginTop: 15,
-    marginLeft: 10
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 
