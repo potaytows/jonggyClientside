@@ -3,6 +3,8 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react
 import axios from 'axios';
 import { useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
+import * as SecureStore from 'expo-secure-store';
+
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -11,7 +13,6 @@ const MenuAddonScreen = ({ route ,navigation}) => {
     const [selectedMenuItem, setSelectedMenuItem] = useState(null);
     const [addons, setAddons] = useState([]);
     const [checkedItems, setCheckedItems] = useState(Array(addons.length).fill(false));
-    const [queueCount, setQueueCount] = useState(0);
 
 
     const fetchAddons = async () => {
@@ -19,7 +20,7 @@ const MenuAddonScreen = ({ route ,navigation}) => {
             const response = await axios.get(`${apiheader}/addons/getAddOnByMenuID/${selectedMenuItem._id}`);
             const result = await response.data;
             setAddons(result);
-
+            setCheckedItems(Array(result.length).fill(false));
         } catch (error) {
             console.error(error);
         }
@@ -43,14 +44,43 @@ const MenuAddonScreen = ({ route ,navigation}) => {
         newCheckedItems[index] = !newCheckedItems[index];
         setCheckedItems(newCheckedItems);
     };
-     const handleAddToCart = async () => {
-        try {
-            setQueueCount(queueCount + 1);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
+    const handleAddCart = async () => {
+        const selectedAddons = addons.filter((addon, index) => checkedItems[index]);
+
+        const cartData = {
+            restaurantId: route.params.restaurantId,
+            selectedTables: selectedTables.map(table => ({ _id: table._id, tableName: table.tableName })),
+            selectedMenuItem: {
+                _id: selectedMenuItem._id,
+                menuName: selectedMenuItem.menuName,
+                price: selectedMenuItem.price,
+                Count: 1 
+            },
+            selectedAddons: selectedAddons.map(addon => ({ _id: addon._id, AddOnName: addon.AddOnName, price: addon.price })),
+            navigationSource: route.params.navigationSource
+        };
+
+        
+        try {
+            await axios.post(apiheader + '/cart/addToCart', cartData);
+            console.log('Cart data added successfully!');
+        } catch (error) {
+            console.error('Error adding cart data: ', error);
+        }
+
+        navigation.navigate('reserve', { 
+            restaurantId: route.params.restaurantId,
+            navigationSource: route.params.navigationSource,
+            selectedTables: selectedTables,
+           
+        });
+    };
+    
+  
+    
+   
+    
 
     return (
         <View style={styles.container}>
@@ -100,10 +130,9 @@ const MenuAddonScreen = ({ route ,navigation}) => {
                     </View>
                 )}
             </View>
-            <TouchableOpacity style={styles.buttonReserve}>
+            <TouchableOpacity style={styles.buttonReserve} onPress={handleAddCart}>
                 <Text style={styles.buttonText}>เพิ่มในตระกร้า</Text>
             </TouchableOpacity>
-            <Text style={styles.queueCountText}>รายการรอคิว: {queueCount}</Text>
         </View>
     );
 };

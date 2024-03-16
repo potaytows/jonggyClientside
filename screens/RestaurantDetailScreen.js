@@ -17,6 +17,8 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   const [restaurantDetails, setRestaurantDetails] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+ 
+  
 
 
   const checkLoginStatus = async () => {
@@ -35,12 +37,14 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 
   const handlecomplete = () => {
     if (!isLoggedIn) {
-      navigation.navigate('profile'); 
+      navigation.navigate('profile');
     } else {
       navigation.navigate('reserve', {
         restaurantId: route.params.restaurantId,
         restaurantName: restaurantDetails.restaurantName,
-        selectedTables: selected
+        selectedTables: selected,
+
+        
       });
       console.log(restaurantDetails)
     }
@@ -105,8 +109,9 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     const item = props.item
     if (contains(selected, item)) {
       return (
-        <TouchableOpacity onPress={() => removeSelected(item)}>
-          <View style={styles.dragablecontent}>
+        <View style={styles.dragablecontent}>
+
+        <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
             <View style={{ left: item.x, top: item.y }}>
               <View style={[styles.tablecontainer]}>
                 <AutoHeightImage
@@ -121,13 +126,14 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
-          </View>
         </TouchableOpacity>
+        </View>
       )
     } else {
       return (
+        <View style={styles.dragablecontent}>
+
         <TouchableOpacity onPress={() => addSelected(item)}>
-          <View style={styles.dragablecontent}>
             <View style={{ left: item.x, top: item.y }}>
               <View style={[styles.tablecontainer]}>
                 <AutoHeightImage
@@ -139,8 +145,8 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
-          </View>
         </TouchableOpacity>
+        </View>
       )
     }
   }
@@ -192,7 +198,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#F0F0F0',
+    backgroundColor: '#F0F0F0',
     flexDirection: 'column',
     alignItems: 'stretch',
     position: 'relative',
@@ -201,11 +207,11 @@ const styles = StyleSheet.create({
   restaurantContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginLeft:20,
-    
+    marginLeft: 20,
+
     marginTop: 30,
   },
-  requestContainer:{
+  requestContainer: {
     marginLeft: 20,
 
   },
@@ -251,19 +257,37 @@ const styles = StyleSheet.create({
     height: 450,
     alignSelf: 'center',
     marginVertical: 20,
-    borderColor: 'black',
-    borderWidth: 1
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+
   },
   tablecontainer: {
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  }, 
+  },
   dragablecontent: {
     position: 'absolute',
     justifyContent: 'center',
-    alignItems: 'center'
-  }
+    alignSelf: 'center'
+
+  },
+  viewshow: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: 'white',
+    height: '15%',
+    width: '100%',
+    borderTopWidth: 2,
+    borderTopColor: '#E6E6E6'
+  },
+  showtable: {
+    marginTop: 15,
+    marginLeft: 10
+  },
+  
+
 });
 
 
