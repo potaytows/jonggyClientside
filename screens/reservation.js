@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
-import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image';
 import _ from 'lodash';
-import * as SecureStore from 'expo-secure-store';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -58,17 +57,16 @@ const ReservationScreen = ({ navigation, route }) => {
             fetchCart();
         } catch (error) {
             console.error(error);
-        } 
+        }
     };
 
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //     }, [])
-        
-    // );
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchCart();
+        }, [])
+      );
 
     useEffect(() => {
-        fetchCart();
         fetchRestaurantDetails();
         setSelectedTables(route.params.selectedTables || []);
     }, []);
@@ -106,55 +104,68 @@ const ReservationScreen = ({ navigation, route }) => {
 
                 <Text style={styles.rq}>ความต้องการเพิ่มเติม</Text>
 
-                <View style={styles.MenuContainer}>
-                    {cartItems && (
-                        <View style={styles.MenuCart}>
-                            <View style={styles.MenuTitle} >
-                                <View style={styles.MenuLi1}>
-                                    <Text style={styles.Ui}>เมนู</Text>
-                                </View>
-                                <View style={styles.MenuLi2}>
-                                    <Text style={styles.Ui}>จำนวน</Text>
-                                </View>
-                                <View style={styles.MenuLi3}>
-                                    <Text style={styles.Ui}>ราคา</Text>
-                                </View>
-                                <View style={styles.MenuLi4}>
-                                    <Text style={styles.Ui}></Text>
+                {cartItems[0] === undefined ? (
+                    <Text style={styles.selectedTables}>-</Text>
+                ) : (
+                    Object.values(_.groupBy(cartItems, item => item.selectedTables.map(table => table._id).join())).map(group => (
+                        <View key={group[0].selectedTables.map(table => table._id).join()}>
+                            <View style={styles.MenuContainer}>
+                                <View style={styles.MenuCart}>
+                                    {group.map((item, index) => (
+                                        <View key={index}>
+                                            <View key={index}>
+
+                                            </View>
+                                            {index === 0 && (
+                                                <View style={styles.listContainer}>
+                                                    <Text style={styles.tableTitle}> {item.selectedTables.length > 1 ?
+                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map(table => <Text>โต๊ะ {table.tableName}</Text>)}
+                                                    </Text>
+                                                    <View style={styles.MenuTitle}>
+
+                                                        <View style={styles.MenuLi1}>
+                                                            <Text style={styles.Ui}>เมนู</Text>
+                                                        </View>
+                                                        <View style={styles.MenuLi2}>
+                                                            <Text style={styles.Ui}>จำนวน</Text>
+                                                        </View>
+                                                        <View style={styles.MenuLi3}>
+                                                            <Text style={styles.Ui}>ราคา</Text>
+                                                        </View>
+                                                        <View style={styles.MenuLi4}>
+                                                            <Text style={styles.Ui}></Text>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            )}
+                                            <View style={styles.MenuTitle}>
+                                                <View style={styles.MenuLi1}>
+                                                    <View style={styles.flexList}>
+                                                        <Text style={styles.menuNameTitle}>{item.selectedMenuItem.menuName}</Text>
+                                                        {item.selectedAddons.map((addon, addonIndex) => (
+                                                            <Text key={addonIndex} style={styles.addonTitle}>{addon.AddOnName}</Text>
+                                                        ))}
+                                                    </View>
+                                                </View>
+                                                <View style={styles.MenuLi2}>
+                                                    <Text style={styles.Ui}>{item.selectedMenuItem.Count}</Text>
+                                                </View>
+                                                <View style={styles.MenuLi3}>
+                                                    <Text style={styles.Ui}>{item.totalPrice}</Text>
+                                                </View>
+                                                <View style={styles.MenuLi4}>
+                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id) }}>
+                                                        <Text style={styles.Delete}>ลบ</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    ))}
                                 </View>
                             </View>
-                            {cartItems.map((item) => (
-                                <View key={item._id}>
-                                    <View style={styles.MenuTitle}>
-                                        <View style={styles.MenuLi1}>
-                                            <View style={styles.flexList}>
-                                                <Text style={styles.menuNameTitle} >{item.selectedMenuItem.menuName}</Text>
-                                                {item.selectedAddons.map((addon) => (
-                                                    <View key={addon._id}>
-                                                        <Text style={styles.addonTitle} >{addon.AddOnName}</Text>
-                                                    </View>
-                                                ))}
-                                            </View>
-
-                                        </View>
-                                        <View style={styles.MenuLi2}>
-                                            <Text style={styles.Ui} >{item.selectedMenuItem.Count}</Text>
-                                        </View>
-                                        <View style={styles.MenuLi3}>
-                                            <Text style={styles.Ui} >{item.selectedMenuItem.price}</Text>
-                                        </View>
-                                        <View style={styles.MenuLi4}>
-                                            <TouchableOpacity  onPress={()=>{fetchDeleteCart(item._id)}}>
-                                                <Text style={styles.Delete}>ลบ</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
-
-                            ))}
                         </View>
-                    )}
-                </View>
+                    ))
+                )}
             </ScrollView>
 
             <TouchableOpacity style={styles.buttonReserve}>
@@ -182,6 +193,8 @@ const styles = StyleSheet.create({
     MenuContainer: {
         marginLeft: 20,
         marginRight: 20,
+        marginBottom: 15
+
     },
     logoRes: {
         width: 80,
@@ -235,7 +248,7 @@ const styles = StyleSheet.create({
     MenuTitle: {
         width: '100%',
         flexDirection: 'row',
-        marginTop: 15
+        marginTop: 10
     },
     MenuLi1: {
         flex: 4,
@@ -255,7 +268,7 @@ const styles = StyleSheet.create({
     },
     Delete: {
         textAlign: 'right',
-        color:'red'
+        color: 'red'
     },
     flexList: {
         flexDirection: 'row',
@@ -266,6 +279,9 @@ const styles = StyleSheet.create({
     },
     addonTitle: {
         color: 'grey'
+    },
+    listContainer: {
+        marginTop: 15
     }
 });
 
