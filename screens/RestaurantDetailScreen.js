@@ -105,7 +105,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     );
   }
 
-  const TableComponent = (props) => {
+  const TableComponent  = (props) => {
     const item = props.item
     if (contains(selected, item)) {
       return (
@@ -128,7 +128,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
             </View>
         </TouchableOpacity>
         </View>
-
       )
     } else {
       return (
@@ -143,20 +142,13 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
                   source={require('../assets/images/table.png')}
                   borderRadius={5}
                 />
-
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
         </TouchableOpacity>
         </View>
-
-
       )
-
     }
-
-
-
   }
 
   return (
@@ -208,6 +200,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F0F0F0',
     flexDirection: 'column',
+    alignItems: 'stretch',
+    position: 'relative',
     paddingBottom: 50
   },
   restaurantContainer: {
@@ -293,6 +287,7 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   
+
 });
 
 
