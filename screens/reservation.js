@@ -4,6 +4,8 @@ import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image';
 import _ from 'lodash';
 import { useFocusEffect } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -13,7 +15,6 @@ const ReservationScreen = ({ navigation, route }) => {
     const [restaurantDetails, setRestaurantDetails] = useState(null);
     const [selectedTables, setSelectedTables] = useState([]);
     const [cartItems, setCartItems] = useState([]);
-
 
 
 
@@ -27,6 +28,7 @@ const ReservationScreen = ({ navigation, route }) => {
     const fetchRestaurantDetails = async () => {
         try {
             if (route.params && route.params.restaurantId) {
+
                 const response = await axios.get(apiheader + '/restaurants/' + route.params.restaurantId);
                 const result = await response.data;
                 setRestaurantDetails(result);
@@ -39,12 +41,14 @@ const ReservationScreen = ({ navigation, route }) => {
     };
     const fetchCart = async () => {
         try {
-            const response = await axios.get(apiheader + '/cart/getByRestaurantID/' + route.params.restaurantId);
+            const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+            const username = login.username
+            const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);
             const result = await response.data;
+
             if (result) {
-                setCartItems(result);
-            } else {
-                console.error("Fetch cart result is empty");
+
+                setCartItems(result)
             }
         } catch (error) {
             console.error(error);
@@ -54,7 +58,26 @@ const ReservationScreen = ({ navigation, route }) => {
         try {
             const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
             const result = await response.data;
-            fetchCart();
+            
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchReserveTables = async () => {
+        console.log(selectedTables)
+        try {
+            const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+            const username = login.username
+            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id}
+            const response = await axios.post(apiheader + '/reservation/reserveTables/', obj);
+            const result = await response.data;
+            if(result.status=="reserved succesfully"){
+                ToastAndroid.showWithGravityAndOffset('จองเสร็จสิ้น!.',ToastAndroid.LONG,ToastAndroid.BOTTOM,25,50)
+                navigation.navigate('tab');
+                
+
+            }
         } catch (error) {
             console.error(error);
         }
@@ -64,7 +87,7 @@ const ReservationScreen = ({ navigation, route }) => {
         React.useCallback(() => {
             fetchCart();
         }, [])
-      );
+    );
 
     useEffect(() => {
         fetchRestaurantDetails();
@@ -119,7 +142,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                             {index === 0 && (
                                                 <View style={styles.listContainer}>
                                                     <Text style={styles.tableTitle}> {item.selectedTables.length > 1 ?
-                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map(table => <Text>โต๊ะ {table.tableName}</Text>)}
+                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.tableName}</Text>)}
                                                     </Text>
                                                     <View style={styles.MenuTitle}>
 
@@ -148,13 +171,13 @@ const ReservationScreen = ({ navigation, route }) => {
                                                     </View>
                                                 </View>
                                                 <View style={styles.MenuLi2}>
-                                                    <Text style={styles.Ui}>{item.selectedMenuItem.Count}</Text>
+                                                    <Text style={styles.Ui}>{item.Count}</Text>
                                                 </View>
                                                 <View style={styles.MenuLi3}>
                                                     <Text style={styles.Ui}>{item.totalPrice}</Text>
                                                 </View>
                                                 <View style={styles.MenuLi4}>
-                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id) }}>
+                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id);fetchCart(); }}>
                                                         <Text style={styles.Delete}>ลบ</Text>
                                                     </TouchableOpacity>
                                                 </View>
@@ -168,7 +191,7 @@ const ReservationScreen = ({ navigation, route }) => {
                 )}
             </ScrollView>
 
-            <TouchableOpacity style={styles.buttonReserve}>
+            <TouchableOpacity style={styles.buttonReserve} onPress={() => { fetchReserveTables() }} >
                 <Text style={styles.buttonText}>ยืนยันการจอง</Text>
             </TouchableOpacity>
         </View>

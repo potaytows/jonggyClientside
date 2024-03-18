@@ -5,8 +5,16 @@ import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image'
 import _ from 'lodash';
 import * as SecureStore from 'expo-secure-store';
+import { useFocusEffect } from '@react-navigation/native';
 
 
+function Menucontains(arr, key, val) {
+
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i][key] === val) return true;
+  }
+  return false;
+}
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -17,10 +25,32 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   const [restaurantDetails, setRestaurantDetails] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
- 
-  
 
+  const CheckExistingOrder = async () => {
 
+    const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+    const username = login.username
+    const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);
+    const result = await response.data;
+    result.map((menu, index) => {
+      if (menu.OrderTableType == "SingleTable") {
+        const exists = selected.find((table) => table._id == menu.selectedTables[0]._id)
+        if (!exists) {
+          fetchDeleteCart(menu._id);
+        }
+      }
+    })
+
+  }
+  const fetchDeleteCart = async (id) => {
+    try {
+      const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
+      const result = await response.data;
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const checkLoginStatus = async () => {
     try {
       const userCredentials = await SecureStore.getItemAsync('userCredentials');
@@ -35,7 +65,8 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     }
   };
 
-  const handlecomplete = () => {
+  const handlecomplete = async () => {
+    await CheckExistingOrder();
     if (!isLoggedIn) {
       navigation.navigate('profile');
     } else {
@@ -43,10 +74,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
         restaurantId: route.params.restaurantId,
         restaurantName: restaurantDetails.restaurantName,
         selectedTables: selected,
-
-        
       });
-      console.log(restaurantDetails)
     }
   };
 
@@ -95,8 +123,14 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   useEffect(() => {
     checkLoginStatus();
     getTables();
-    fetchRestaurantDetails();
+
   }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchRestaurantDetails();
+
+    }, [])
+  );
   if (!restaurantDetails) {
     return (
       <View>
@@ -105,13 +139,13 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     );
   }
 
-  const TableComponent  = (props) => {
+  const TableComponent = (props) => {
     const item = props.item
     if (contains(selected, item)) {
       return (
         <View style={styles.dragablecontent}>
 
-        <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
+          <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
             <View style={{ left: item.x, top: item.y }}>
               <View style={[styles.tablecontainer]}>
                 <AutoHeightImage
@@ -126,14 +160,14 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
         </View>
       )
     } else {
       return (
         <View style={styles.dragablecontent}>
 
-        <TouchableOpacity onPress={() => addSelected(item)}>
+          <TouchableOpacity onPress={() => addSelected(item)}>
             <View style={{ left: item.x, top: item.y }}>
               <View style={[styles.tablecontainer]}>
                 <AutoHeightImage
@@ -145,7 +179,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.text}>{item.tableName}</Text>
               </View>
             </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
         </View>
       )
     }
@@ -286,7 +320,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginLeft: 10
   },
-  
+
 
 });
 

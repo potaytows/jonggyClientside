@@ -47,7 +47,8 @@ const MenuAddonScreen = ({ route ,navigation}) => {
 
     const handleAddCart = async () => {
         const selectedAddons = addons.filter((addon, index) => checkedItems[index]);
-
+        const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+        const username = login.username
         const cartData = {
             restaurantId: route.params.restaurantId,
             selectedTables: selectedTables.map(table => ({ _id: table._id, tableName: table.tableName })),
@@ -55,10 +56,11 @@ const MenuAddonScreen = ({ route ,navigation}) => {
                 _id: selectedMenuItem._id,
                 menuName: selectedMenuItem.menuName,
                 price: selectedMenuItem.price,
-                Count: 1 
             },
             selectedAddons: selectedAddons.map(addon => ({ _id: addon._id, AddOnName: addon.AddOnName, price: addon.price })),
-            navigationSource: route.params.navigationSource
+            OrderTableType: route.params.navigationSource,
+            username:username,
+            Count:1
         };
 
         
@@ -92,7 +94,7 @@ const MenuAddonScreen = ({ route ,navigation}) => {
             {route.params.navigationSource === 'OrderTogether' ? (
                 <Text style={styles.selectedTablesText}>รวมโต๊ะ</Text>
             ) : null}
-            {route.params.navigationSource === 'ChooseTable' ? (
+            {route.params.navigationSource === 'SingleTable' ? (
                 <Text style={styles.selectedTablesText}>
                     โต๊ะ {selectedTables.map((table) => table.tableName).join(', ')}
                 </Text>

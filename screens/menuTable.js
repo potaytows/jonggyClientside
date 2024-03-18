@@ -23,7 +23,7 @@ const MenuTableScreen = ({route, navigation  }) => {
         navigation.navigate('chooseTable', {
             restaurantId: route.params.restaurantId,
             selectedTables: selectedTables,
-            navigationSource: 'ChooseTable',
+            navigationSource: 'SingleTable',
             
 
         });
@@ -43,7 +43,7 @@ const MenuTableScreen = ({route, navigation  }) => {
                             <Text style={styles.buttonText}>สั่งอาหารรวมโต๊ะ</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.button} onPress={handleChooseTable}>
-                            <Text style={styles.buttonText}>สั่งอาหารแยกโตีะ</Text>
+                            <Text style={styles.buttonText}>สั่งอาหารแยกโต๊ะ</Text>
                         </TouchableOpacity>
                     </View>
 

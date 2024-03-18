@@ -16,7 +16,6 @@ const MenuList = ({ route ,navigation }) => {
             navigationSource: route.params.navigationSource,
             selectedMenuItem: selectedMenuItem,
             selectedTables: selectedTables,
-           
         });
 
     };
@@ -24,7 +23,7 @@ const MenuList = ({ route ,navigation }) => {
 
     const fetchMenuItems = async () => {
         try {
-            const response = await axios.get(`${apiheader}/menus//getMenus/${route.params.restaurantId}`);
+            const response = await axios.get(`${apiheader}/menus/getMenus/${route.params.restaurantId}`);
             const result = await response.data;
             setMenuItems(result);
         } catch (error) {
@@ -42,12 +41,11 @@ const MenuList = ({ route ,navigation }) => {
         <View style={styles.container}>
             <View style={styles.header}>
                 <Image style={styles.backgroundImage} source={require('../assets/images/profile.png')} />
-
             </View>
             {route.params.navigationSource === 'OrderTogether' ? (
                 <Text style={styles.selectedTablesText}>รวมโต๊ะ</Text>
             ) : null}
-            {route.params.navigationSource === 'ChooseTable' ? (
+            {route.params.navigationSource === 'SingleTable' ? (
 
                 <Text style={styles.selectedTablesText}>
                     โต๊ะ {selectedTables.map((table) => table.tableName).join(', ')}
@@ -93,7 +91,6 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         marginRight: 15,
         marginTop: 15
-
     },
     card: {
         width: '100%',
