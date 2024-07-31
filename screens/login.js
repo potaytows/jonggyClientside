@@ -80,6 +80,7 @@ const LoginScreen = ({ navigation }) => {
                     secureTextEntry
                 />
                 {usernameNotFound && passwordNotFound && <Text style={styles.errorText}>ไม่พบชื่อผู้ใช้ดังกล่าว</Text>}
+                
 
                 <TouchableOpacity style={styles.buttonwellcome} onPress={handleForgotPassword}>
                     <Text style={styles.textbutton}>ลืมรหัสผ่าน</Text>
