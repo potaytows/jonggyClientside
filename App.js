@@ -21,7 +21,7 @@ import ReservationListScreen from './screens/reservationList';
 import ReservationDetailScreen from './screens/reservationDetail';
 import ChatScreen from './screens/chat';
 import { NotificationProvider } from './screens/notification';
-import FlashMessage from "react-native-flash-message";
+import FlashMessage from 'react-native-flash-message';
 const Stack = createStackNavigator();
 
 
@@ -50,7 +50,6 @@ const App = () => {
   return (
     <NavigationContainer>
       <NotificationProvider>
-
         <Stack.Navigator
           screenOptions={{
             headerStyle: { backgroundColor: '#ff8a24' },
