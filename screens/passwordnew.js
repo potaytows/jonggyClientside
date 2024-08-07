@@ -30,7 +30,6 @@ const PasswordNewScreen = ({ route, navigation }) => {
               const response = await axios.post(`${apiheader}/users/resetPassword/${email}`, {
                 newPassword,
               });
-  
               if (response.data.status === 'password reset success') {
                 Alert.alert('Success', 'รหัสผ่านถูกเปลี่ยนแล้ว');
                 navigation.navigate('Login'); 

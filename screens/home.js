@@ -35,6 +35,10 @@ const HomeScreen = ({navigation}) => {
     fetchRestaurants();
   }, [searchQuery]);
 
+  useEffect(() => {
+    fetchRestaurants();
+  }, []);
+
   return (
     <ScrollView>
       <View style={styles.container}>
