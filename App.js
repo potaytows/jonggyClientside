@@ -64,11 +64,6 @@ const App=()=> {
         <Stack.Screen name='menuList' component={MenuListScreen}  />
         <Stack.Screen name='chooseTable' component={MenuChooseTableScreen}  />
         <Stack.Screen name='menuAddon' component={MenuAddonScreen}  />
-
-
-
-
-
         <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName})}/>
         
       </Stack.Navigator>
