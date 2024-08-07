@@ -8,7 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const MenuAddonScreen = ({ route ,navigation}) => {
+const MenuAddonScreen = ({ route, navigation }) => {
     const [selectedTables, setSelectedTables] = useState([]);
     const [selectedMenuItem, setSelectedMenuItem] = useState(null);
     const [addons, setAddons] = useState([]);
@@ -59,30 +59,29 @@ const MenuAddonScreen = ({ route ,navigation}) => {
             },
             selectedAddons: selectedAddons.map(addon => ({ _id: addon._id, AddOnName: addon.AddOnName, price: addon.price })),
             OrderTableType: route.params.navigationSource,
-            username:username,
-            Count:1
+            username: username,
+            Count: 1
         };
 
-        
+
         try {
             await axios.post(apiheader + '/cart/addToCart', cartData);
             console.log('Cart data added successfully!');
         } catch (error) {
             console.error('Error adding cart data: ', error);
         }
-
-        navigation.navigate('reserve', { 
-            restaurantId: route.params.restaurantId,
-            navigationSource: route.params.navigationSource,
-            selectedTables: selectedTables,
-           
-        });
+        navigation.navigate('reserve',
+            {
+                restaurantId: route.params.restaurantId,
+                navigationSource: route.params.navigationSource,
+                selectedTables: selectedTables,
+            });
     };
-    
-  
-    
-   
-    
+
+
+
+
+
 
     return (
         <View style={styles.container}>

@@ -141,6 +141,26 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 
   const TableComponent = (props) => {
     const item = props.item
+    if (item.type == "text") {
+      return (
+          <View style={[styles.container]}>
+              <Text style={styles.text}>{item.text}</Text>
+          </View>
+      );
+
+  }
+  // ? backgroundColor:item.color:{}
+  if (item.type == "shape") {
+      return (
+          <View style={[styles.container,{left:item.x,top:item.y}]}>
+              <View style={[styles.shape, { height: item.height, width: item.width, backgroundColor: item.color }]}>
+              </View>
+
+          </View>
+      );
+
+  }
+  if (item.type == "table") {
     if (contains(selected, item)) {
       return (
         <View style={styles.dragablecontent}>
@@ -148,16 +168,14 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
             <View style={{ left: item.x, top: item.y }}>
               <View style={[styles.tablecontainer]}>
-                <AutoHeightImage
-                  width={30}
-                  height={30}
+                <Image
+                  style={styles.image}
                   source={require('../assets/images/table.png')}
-                  borderRadius={5}
                   tintColor={"gray"}
 
                 />
 
-                <Text style={styles.text}>{item.tableName}</Text>
+                <Text style={styles.text}>{item.text}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -170,19 +188,21 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           <TouchableOpacity onPress={() => addSelected(item)}>
             <View style={{ left: item.x, top: item.y }}>
               <View style={[styles.tablecontainer]}>
-                <AutoHeightImage
-                  width={30}
-                  height={30}
+                <Image
                   source={require('../assets/images/table.png')}
-                  borderRadius={5}
+                  style={styles.image}
                 />
-                <Text style={styles.text}>{item.tableName}</Text>
+                <Text style={styles.text}>{item.text}</Text>
               </View>
             </View>
           </TouchableOpacity>
         </View>
       )
     }
+    
+
+}
+    
   }
 
   return (
@@ -213,8 +233,8 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
         <Text style={styles.showtable}>
           โต๊ะที่เลือก: {selected.map((item, index) => (
             index == selected.length - 1 ? (
-              <Text key={index} >{item.tableName}</Text>
-            ) : (<Text key={index} >{item.tableName}, </Text>)
+              <Text key={index} >{item.text}</Text>
+            ) : (<Text key={index} >{item.text}, </Text>)
 
           ))}
         </Text>
@@ -320,6 +340,10 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginLeft: 10
   },
+  image: {
+    height: 30,
+    width: 30
+  }
 
 
 });

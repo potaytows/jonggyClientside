@@ -28,16 +28,16 @@ const RegisterScreen = ({ navigation }) => {
   const handleConfirm = (selectedDate) => {
     hideDatePicker();
     let dateTimeString =
-    selectedDate.getDate() +
-    '-' +
-    (selectedDate.getMonth() + 1) +
-    '-' +
-    selectedDate.getFullYear()
+      selectedDate.getDate() +
+      '-' +
+      (selectedDate.getMonth() + 1) +
+      '-' +
+      selectedDate.getFullYear()
     if (selectedDate) {
       setBirthday(dateTimeString);
     }
   };
-  
+
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -163,7 +163,7 @@ const RegisterScreen = ({ navigation }) => {
           }}
         />
 
-<TouchableOpacity
+        <TouchableOpacity
           style={[styles.button, !isPhoneNumberValid && styles.disabledButton]}
           onPress={fetchaddUser}
           disabled={!isPhoneNumberValid}
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     marginLeft: 45,
     color: '#FF914D',
     marginBottom: 5,
-    
+
 
   },
   passwordInputContainer: {
