@@ -240,7 +240,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
         </Text>
 
         <TouchableOpacity style={styles.reserveButton} onPress={handlecomplete} >
-          <Text style={styles.reserveButtonText}>ยืนยันการจอง</Text>
+          <Text style={styles.reserveButtonText}>ยืนยันการเลือกโต๊ะ</Text>
         </TouchableOpacity>
       </View>
     </View>

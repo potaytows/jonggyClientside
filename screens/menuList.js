@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import axios from 'axios';
 import { useRoute } from '@react-navigation/native';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
-const MenuList = ({ route ,navigation }) => {
+const MenuList = ({ route, navigation }) => {
     const [menuItems, setMenuItems] = useState([]);
     const [selectedTables, setSelectedTables] = useState([]);
 
 
     const handleSetAddon = (selectedMenuItem) => {
-        navigation.navigate('menuAddon', { 
+        navigation.navigate('menuAddon', {
             restaurantId: route.params.restaurantId,
             navigationSource: route.params.navigationSource,
             selectedMenuItem: selectedMenuItem,
@@ -39,9 +40,7 @@ const MenuList = ({ route ,navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Image style={styles.backgroundImage} source={require('../assets/images/profile.png')} />
-            </View>
+            <View style={styles.titlemenu}>
             {route.params.navigationSource === 'OrderTogether' ? (
                 <Text style={styles.selectedTablesText}>รวมโต๊ะ</Text>
             ) : null}
@@ -56,27 +55,34 @@ const MenuList = ({ route ,navigation }) => {
                 <View style={styles.noResultsContainer}>
                     <Text style={styles.noResultsText}>ยังไม่มีเมนูอาหารในขณะนี้</Text>
                 </View>
-
-
-
             )}
+
+            <Text>เมนูแนะนำ</Text>
+            </View>
             <View style={styles.restaurantListContainer}>
-            {menuItems && menuItems.map((item, index) => (
-                        <TouchableOpacity style={styles.menubox}
-                        onPress={() => handleSetAddon(item)}
-                            key={item._id}
-                        >
+
+                {menuItems && menuItems.map((item, index) => (
+                    <View style={styles.menubox}
+
+                    >
+                        <View style={styles.cardspace}>
                             <View style={styles.card}>
                                 <Image style={styles.logo} source={{ uri: apiheader + '/image/getMenuIcon/' + item._id }} />
                                 <View style={styles.menuItem}>
                                     <Text style={styles.menuName}>{item.menuName}</Text>
-                                    <Text style={styles.price}>฿{item.price}</Text>
+                                    <View style={styles.flexAddmenu}>
+                                        <Text style={styles.price}>฿{item.price}</Text>
+                                        <TouchableOpacity style={styles.Addmenu} onPress={() => handleSetAddon(item)}
+                                            key={item._id}>
+                                                <AntDesign name="plussquare" size={30} color="#FF914D" />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
-                        </TouchableOpacity>
-                        ))}
+                        </View>
+                    </View>
+                ))}
             </View>
-
         </View>
     );
 };
@@ -84,43 +90,60 @@ const MenuList = ({ route ,navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor:'white'
+        
 
+    },
+    titlemenu:{
+        marginLeft:30,
+        marginRight:30,
     },
     menubox: {
         marginLeft: 15,
         marginRight: 15,
-        marginTop: 15
+        marginTop: 10
+    },
+    cardspace: {
+        padding: 15,
+        borderWidth: 1,
+        borderColor:'gray',
+        borderRadius: 10,
+        backgroundColor:'white'
+
+
     },
     card: {
         width: '100%',
-    },
-    header: {
-        width: '100%',
-        height: "22%"
+        backgroundColor:'white'
+
     },
     menuName: {
-        fontSize: 16,
-        marginBottom: 8,
+        fontSize: 18,
+        marginBottom: 2,
     },
     price: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#FF66AB',
         fontWeight: 'bold',
     },
     logo: {
-        width: 150,
-        height: 150,
+        width: 155,
+        height: 155,
         resizeMode: 'cover',
         borderRadius: 5,
         alignSelf: 'center'
+    },
+    flexAddmenu: {
+        flexDirection: 'row',
+    },
+    Addmenu: {
+        marginLeft: 'auto',
     },
     restaurantListContainer: {
         flex: 1,
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        backgroundColor:'white'
+       
 
 
     },
@@ -140,7 +163,7 @@ const styles = StyleSheet.create({
         color: 'gray',
     },
     selectedTablesText: {
-        textAlign: 'center',
+        textAlign: 'right',
         marginTop: 15,
         fontSize: 18,
         fontWeight: 'bold'
