@@ -22,6 +22,7 @@ import ReservationDetailScreen from './screens/reservationDetail';
 import ChatScreen from './screens/chat';
 import { NotificationProvider } from './screens/notification';
 import FlashMessage from 'react-native-flash-message';
+import SelectTimeScreen from './screens/selectTime';
 const Stack = createStackNavigator();
 
 
@@ -74,6 +75,7 @@ const App = () => {
           <Stack.Screen name='reservationDetail' component={ReservationDetailScreen} />
           <Stack.Screen name='Chat' component={ChatScreen} />
           <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
+          <Stack.Screen name='selecttime' component={SelectTimeScreen} />
         </Stack.Navigator>
         <FlashMessage position="top" />
       </NotificationProvider>

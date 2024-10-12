@@ -13,6 +13,9 @@ const ProfileScreen = ({ navigation }) => {
   const handleEditProfile = () => {
     navigation.navigate('EditProfile', { userInfo });
   };
+  const settime = () => {
+    navigation.navigate('selecttime', { userInfo });
+  };
 
 
   const checkLoginStatus = async () => {
@@ -75,7 +78,7 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.Other}>
 
             <Text style={styles.textTitle}>บัญชีของฉัน</Text>
-            <TouchableOpacity style={styles.underline} >
+            <TouchableOpacity style={styles.underline}onPress={settime} >
               <Text style={styles.textchick}>รายการโปรด</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.underline} >
@@ -99,7 +102,7 @@ const ProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       ) : (
-        <View>
+        <View style={styles.loginScreen}>
           <Image style={styles.Logo}
             source={require('../assets/images/Jonggylogo.png')}
           />
@@ -162,15 +165,28 @@ const styles = StyleSheet.create({
     marginTop:10,
     marginBottom:2,
     color: 'red',
+    
   },
-  textbuttons: {
-    color: 'white',
-    textAlign: 'center',
+  textbuttons:{
+    backgroundColor:'#FF914D',
+    padding:10,
+    textAlign:'center',
+    fontSize:18,
+    color:'white',
+    borderRadius:10
+  },
+  buttons: {
   },
   Logo: {
     width: 200,
     height: 200
   },
+  loginScreen:{
+    flex:1,
+    width:'50%',
+    justifyContent:'center',
+    alignSelf:'center'
+  }
 });
 
 export default ProfileScreen;

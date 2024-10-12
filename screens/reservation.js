@@ -15,12 +15,14 @@ const ReservationScreen = ({ navigation, route }) => {
     const [restaurantDetails, setRestaurantDetails] = useState(null);
     const [selectedTables, setSelectedTables] = useState([]);
     const [cartItems, setCartItems] = useState([]);
+    
 
 
 
     const handleGetMenu = () => {
         navigation.navigate('menuTable', {
             restaurantId: route.params.restaurantId,
+            restaurant: restaurantDetails,
             selectedTables: selectedTables,
         });
     };

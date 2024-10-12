@@ -14,6 +14,7 @@ const MenuTableScreen = ({route, navigation  }) => {
     const handleOrderTogether = () => {
         navigation.navigate('menuList', {
             restaurantId: route.params.restaurantId,
+            restaurant: route.params.restaurant,
             selectedTables: selectedTables,
             navigationSource: 'OrderTogether',
         });
@@ -23,6 +24,7 @@ const MenuTableScreen = ({route, navigation  }) => {
         navigation.navigate('chooseTable', {
             restaurantId: route.params.restaurantId,
             selectedTables: selectedTables,
+            restaurant: route.params.restaurant,
             navigationSource: 'SingleTable',
             
 
