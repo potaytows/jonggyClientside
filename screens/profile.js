@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity,Image } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -12,6 +13,9 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleEditProfile = () => {
     navigation.navigate('EditProfile', { userInfo });
+  };
+  const settime = () => {
+    navigation.navigate('selecttime', { userInfo });
   };
 
 
@@ -51,7 +55,7 @@ const ProfileScreen = ({ navigation }) => {
       setIsLoggedIn(false);
       setUserInfo(null);
       navigation.navigate('Login');
-      
+
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -59,25 +63,65 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <LinearGradient style={styles.header}
+        colors={['#FB992C', '#EC7A45']} start={{ x: 0.2, y: 0.8 }}>
+        <View style={styles.flexheader}>
+          <Text style={styles.home}>ฉัน</Text>
+        </View>
+      </LinearGradient>
       {isLoggedIn ? (
         <View>
-          <TouchableOpacity onPress={handleEditProfile}>
-            <Text>ชื่อผู้ใช้: {userInfo?.username}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleLogout}>
-            <Text style={styles.textbutton}>ออกจากระบบ</Text>
-          </TouchableOpacity>
+          <View style={styles.Profilecontainer}>
+
+            <View style={styles.flexpro_img}>
+              <TouchableOpacity>
+                <View style={styles.profileImage}><Text></Text></View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.ChangeUser} onPress={handleEditProfile}>
+                <Text style={styles.Name}>{userInfo?.username}</Text>
+                <Text style={styles.Email}>{userInfo?.email}</Text>
+
+              </TouchableOpacity>
+            </View>
+            <View style={styles.Other}>
+
+              <Text style={styles.textTitle}>บัญชีของฉัน</Text>
+              <TouchableOpacity style={styles.underline} onPress={settime} >
+                <Text style={styles.textchick}>รายการโปรด</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>วิธีการชำระเงิน</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>สถานที่ที่ถูกบันทึกไว้</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.textTitle}>ทั่วไป</Text>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>ศูนย์ช่วยเหลือ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>การตั้งค่า</Text>
+              </TouchableOpacity>
+
+            </View>
+            <TouchableOpacity style={styles.underline} onPress={handleLogout}>
+              <Text style={styles.textbutton}>ออกจากระบบ</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+
       ) : (
-        <View>
+        <View style={styles.loginScreen}>
           <Image style={styles.Logo}
-                source={require('../assets/images/Jonggylogo.png')}
-            />
-        <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Login')}>
+            source={require('../assets/images/Jonggylogo.png')}
+          />
+          <TouchableOpacity style={styles.buttons} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.textbuttons}>เข้าสู่ระบบ</Text>
           </TouchableOpacity>
-          </View>
+        </View>
       )}
+
     </View>
   );
 };
@@ -85,36 +129,97 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+
+
+  },
+  Profilecontainer: {
+    marginLeft: 20,
+    marginRight: 20
+  },
+  header: {
+    width: '100%',
+    paddingTop: 50,
+    paddingBottom: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10
+
+  },
+  flexheader: {
+    flexDirection: 'row',
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  home: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  ChangeUser: {
+    marginLeft: 30
+  },
+  flexpro_img: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 20
   },
-  button: {
-    width: '40%',
-    marginTop: 20,
-    alignSelf: 'center',
-    borderRadius: 5
+  Name: {
+    fontSize: 25
   },
-  buttons: {
-    width: '40%',
-    backgroundColor:'#FF914D',
-    padding:10,
-    marginTop: 20,
-    alignSelf: 'center',
-    borderRadius: 5
+  Email: {
+    fontSize: 18,
+    color: 'gray'
+  },
+
+  underline: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray'
+  },
+  textchick: {
+    fontSize: 18,
+    marginTop: 15,
+    marginBottom: 2
+
+  },
+  textTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20
+  },
+  profileImage: {
+    width: 75,
+    height: 75,
+    backgroundColor: 'gray',
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: 'black'
   },
   textbutton: {
+    fontSize: 18,
+    marginTop: 10,
+    marginBottom: 2,
     color: 'red',
-    textAlign: 'center',
-    textDecorationLine:'underline'
+
   },
   textbuttons: {
-    color: 'white',
+    backgroundColor: '#FF914D',
+    padding: 10,
     textAlign: 'center',
+    fontSize: 18,
+    color: 'white',
+    borderRadius: 10
+  },
+  buttons: {
   },
   Logo: {
     width: 200,
     height: 200
-},
+  },
+  loginScreen: {
+    flex: 1,
+    width: '50%',
+    justifyContent: 'center',
+    alignSelf: 'center'
+  }
 });
 
 export default ProfileScreen;

@@ -6,7 +6,7 @@ import AutoHeightImage from 'react-native-auto-height-image'
 import _ from 'lodash';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 function Menucontains(arr, key, val) {
 
@@ -66,7 +66,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   };
 
   const handlecomplete = async () => {
-    await CheckExistingOrder();
     if (!isLoggedIn) {
       navigation.navigate('profile');
     } else {
@@ -77,7 +76,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
       });
     }
   };
-
   function compareObjs(obj1, obj2) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
@@ -143,66 +141,66 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     const item = props.item
     if (item.type == "text") {
       return (
-          <View style={[styles.container]}>
-              <Text style={styles.text}>{item.text}</Text>
-          </View>
+        <View style={[styles.container]}>
+          <Text style={styles.text}>{item.text}</Text>
+        </View>
       );
 
-  }
-  // ? backgroundColor:item.color:{}
-  if (item.type == "shape") {
-      return (
-          <View style={[styles.container,{left:item.x,top:item.y}]}>
-              <View style={[styles.shape, { height: item.height, width: item.width, backgroundColor: item.color }]}>
-              </View>
-
-          </View>
-      );
-
-  }
-  if (item.type == "table") {
-    if (contains(selected, item)) {
-      return (
-        <View style={styles.dragablecontent}>
-
-          <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
-            <View style={{ left: item.x, top: item.y }}>
-              <View style={[styles.tablecontainer]}>
-                <Image
-                  style={styles.image}
-                  source={require('../assets/images/table.png')}
-                  tintColor={"gray"}
-
-                />
-
-                <Text style={styles.text}>{item.text}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-      )
-    } else {
-      return (
-        <View style={styles.dragablecontent}>
-
-          <TouchableOpacity onPress={() => addSelected(item)}>
-            <View style={{ left: item.x, top: item.y }}>
-              <View style={[styles.tablecontainer]}>
-                <Image
-                  source={require('../assets/images/table.png')}
-                  style={styles.image}
-                />
-                <Text style={styles.text}>{item.text}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-      )
     }
-    
+    // ? backgroundColor:item.color:{}
+    if (item.type == "shape") {
+      return (
+        <View style={[styles.container, { left: item.x, top: item.y }]}>
+          <View style={[styles.shape, { height: item.height, width: item.width, backgroundColor: item.color }]}>
+          </View>
 
-}
-    
+        </View>
+      );
+
+    }
+    if (item.type == "table") {
+      if (contains(selected, item)) {
+        return (
+          <View style={styles.dragablecontent}>
+
+            <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
+              <View style={{ left: item.x, top: item.y }}>
+                <View style={[styles.tablecontainer]}>
+                  <Image
+                    style={styles.image}
+                    source={require('../assets/images/table.png')}
+                    tintColor={"gray"}
+
+                  />
+
+                  <Text style={styles.text}>{item.text}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )
+      } else {
+        return (
+          <View style={styles.dragablecontent}>
+
+            <TouchableOpacity onPress={() => addSelected(item)}>
+              <View style={{ left: item.x, top: item.y }}>
+                <View style={[styles.tablecontainer]}>
+                  <Image
+                    source={require('../assets/images/table.png')}
+                    style={styles.image}
+                  />
+                  <Text style={styles.text}>{item.text}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )
+      }
+
+
+    }
+
   }
 
   return (
@@ -210,9 +208,24 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.restaurantContainer}>
-            <Image style={styles.logoRes} source={{ uri: apiheader + '/image/getRestaurantIcon/' + restaurantDetails._id }} />
+            <View style={styles.laoutlogoRes}>
+              <Image style={styles.logoRes} source={{ uri: apiheader + '/image/getRestaurantIcon/' + restaurantDetails._id }} />
+            </View>
             <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
 
+          </View>
+          <View  style={styles.layoutGuid}>
+          <View style={styles.flexGuid}>
+            <FontAwesome name="circle" size={24} color="#FF7A00" />
+            <Text style={styles.statusGuid}>ว่าง</Text>
+
+            <FontAwesome name="circle" size={24} color="#C3F9C9" />
+            <Text style={styles.statusGuid}>เลือก</Text>
+
+            <FontAwesome name="circle" size={24} color="gray" />
+            <Text style={styles.statusGuid}>เต็ม</Text>
+
+          </View>
           </View>
           <View style={styles.dragablecontainer}>
             {obj.map((item, index) => (
@@ -240,7 +253,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
         </Text>
 
         <TouchableOpacity style={styles.reserveButton} onPress={handlecomplete} >
-          <Text style={styles.reserveButtonText}>ยืนยันการจอง</Text>
+          <Text style={styles.reserveButtonText}>ยืนยันการเลือกโต๊ะ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -252,7 +265,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F0F0',
     flexDirection: 'column',
     alignItems: 'stretch',
     position: 'relative',
@@ -261,23 +273,39 @@ const styles = StyleSheet.create({
   restaurantContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginLeft: 20,
+    backgroundColor: 'white',
+    paddingTop: 20,
+    paddingBottom: 10,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
 
-    marginTop: 30,
+    elevation: 5,
   },
   requestContainer: {
     marginLeft: 20,
 
   },
-  logoRes: {
+  laoutlogoRes: {
     width: 80,
-    height: 120,
+    height: 100,
+    marginLeft: 20
+  },
+  logoRes: {
+    width: '100%',
+    height: 100,
     resizeMode: 'cover',
     borderRadius: 5,
   },
   restaurantName: {
     marginLeft: 10,
     marginTop: 5,
+    fontSize: 18,
+    color: '#FF914D',
+    fontWeight: 'bold'
   },
   reserveButton: {
     position: 'absolute',
@@ -313,6 +341,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderBottomColor: 'gray',
     borderBottomWidth: 1,
+    backgroundColor: 'white'
 
   },
   tablecontainer: {
@@ -324,6 +353,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignSelf: 'center'
+
 
   },
   viewshow: {
@@ -343,6 +373,26 @@ const styles = StyleSheet.create({
   image: {
     height: 30,
     width: 30
+  },
+  layoutGuid:{
+    flex:1,
+    alignSelf:'flex-end',
+    marginLeft:10,
+    marginRight:10
+  },
+  flexGuid: {
+    marginTop:15,
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: 'gray',
+    alignItems: 'center',
+    padding: 10,
+   borderRadius:10
+
+  },
+  statusGuid:{
+    marginLeft:10,
+    marginRight:10
   }
 
 
