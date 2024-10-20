@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, TouchableOpacity, Image } from 'react-n
 import { HeaderBackButton } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -62,45 +63,54 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <LinearGradient style={styles.header}
+        colors={['#FB992C', '#EC7A45']} start={{ x: 0.2, y: 0.8 }}>
+        <View style={styles.flexheader}>
+          <Text style={styles.home}>ฉัน</Text>
+        </View>
+      </LinearGradient>
       {isLoggedIn ? (
         <View>
+          <View style={styles.Profilecontainer}>
 
-          <View style={styles.flexpro_img}>
-            <TouchableOpacity>
-              <View style={styles.profileImage}><Text></Text></View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.ChangeUser} onPress={handleEditProfile}>
-              <Text style={styles.Name}>{userInfo?.username}</Text>
-              <Text style={styles.Email}>{userInfo?.email}</Text>
+            <View style={styles.flexpro_img}>
+              <TouchableOpacity>
+                <View style={styles.profileImage}><Text></Text></View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.ChangeUser} onPress={handleEditProfile}>
+                <Text style={styles.Name}>{userInfo?.username}</Text>
+                <Text style={styles.Email}>{userInfo?.email}</Text>
 
+              </TouchableOpacity>
+            </View>
+            <View style={styles.Other}>
+
+              <Text style={styles.textTitle}>บัญชีของฉัน</Text>
+              <TouchableOpacity style={styles.underline} onPress={settime} >
+                <Text style={styles.textchick}>รายการโปรด</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>วิธีการชำระเงิน</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>สถานที่ที่ถูกบันทึกไว้</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.textTitle}>ทั่วไป</Text>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>ศูนย์ช่วยเหลือ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.underline} >
+                <Text style={styles.textchick}>การตั้งค่า</Text>
+              </TouchableOpacity>
+
+            </View>
+            <TouchableOpacity style={styles.underline} onPress={handleLogout}>
+              <Text style={styles.textbutton}>ออกจากระบบ</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.Other}>
-
-            <Text style={styles.textTitle}>บัญชีของฉัน</Text>
-            <TouchableOpacity style={styles.underline}onPress={settime} >
-              <Text style={styles.textchick}>รายการโปรด</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.underline} >
-              <Text style={styles.textchick}>วิธีการชำระเงิน</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.underline} >
-              <Text style={styles.textchick}>สถานที่ที่ถูกบันทึกไว้</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.textTitle}>ทั่วไป</Text>
-            <TouchableOpacity style={styles.underline} >
-              <Text style={styles.textchick}>ศูนย์ช่วยเหลือ</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.underline} >
-              <Text style={styles.textchick}>การตั้งค่า</Text>
-            </TouchableOpacity>
-
-          </View>
-          <TouchableOpacity style={styles.underline} onPress={handleLogout}>
-            <Text style={styles.textbutton}>ออกจากระบบ</Text>
-          </TouchableOpacity>
         </View>
+
       ) : (
         <View style={styles.loginScreen}>
           <Image style={styles.Logo}
@@ -111,6 +121,7 @@ const ProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
+
     </View>
   );
 };
@@ -118,16 +129,38 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50,
-    margin: 30,
 
+
+  },
+  Profilecontainer: {
+    marginLeft: 20,
+    marginRight: 20
+  },
+  header: {
+    width: '100%',
+    paddingTop: 50,
+    paddingBottom: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10
+
+  },
+  flexheader: {
+    flexDirection: 'row',
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  home: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   ChangeUser: {
     marginLeft: 30
   },
   flexpro_img: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 20
   },
   Name: {
     fontSize: 25
@@ -137,20 +170,20 @@ const styles = StyleSheet.create({
     color: 'gray'
   },
 
-  underline:{
-    borderBottomWidth:1,
-    borderBottomColor:'gray'
+  underline: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray'
   },
   textchick: {
     fontSize: 18,
-    marginTop:15,
-    marginBottom:2
+    marginTop: 15,
+    marginBottom: 2
 
   },
-  textTitle:{
+  textTitle: {
     fontSize: 18,
-    fontWeight:'bold',
-    marginTop:20
+    fontWeight: 'bold',
+    marginTop: 20
   },
   profileImage: {
     width: 75,
@@ -162,18 +195,18 @@ const styles = StyleSheet.create({
   },
   textbutton: {
     fontSize: 18,
-    marginTop:10,
-    marginBottom:2,
+    marginTop: 10,
+    marginBottom: 2,
     color: 'red',
-    
+
   },
-  textbuttons:{
-    backgroundColor:'#FF914D',
-    padding:10,
-    textAlign:'center',
-    fontSize:18,
-    color:'white',
-    borderRadius:10
+  textbuttons: {
+    backgroundColor: '#FF914D',
+    padding: 10,
+    textAlign: 'center',
+    fontSize: 18,
+    color: 'white',
+    borderRadius: 10
   },
   buttons: {
   },
@@ -181,11 +214,11 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200
   },
-  loginScreen:{
-    flex:1,
-    width:'50%',
-    justifyContent:'center',
-    alignSelf:'center'
+  loginScreen: {
+    flex: 1,
+    width: '50%',
+    justifyContent: 'center',
+    alignSelf: 'center'
   }
 });
 

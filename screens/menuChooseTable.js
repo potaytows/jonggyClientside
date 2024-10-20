@@ -12,6 +12,7 @@ const MenuChooseTableScreen = ({ route, navigation }) => {
     const handleMenuChooseTable = (selectedTable) => {
         navigation.navigate('menuList', {
             restaurantId: route.params.restaurantId,
+            restaurant: route.params.restaurant,
             selectedTables: [selectedTable],
             navigationSource: route.params.navigationSource,
         });

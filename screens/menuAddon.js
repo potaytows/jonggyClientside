@@ -61,10 +61,10 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
                 menuName: selectedMenuItem.menuName,
                 price: selectedMenuItem.price,
             },
-            selectedAddons: selectedAddons.map(addon => ({ _id: addon._id, AddOnName: addon.AddOnName, price: addon.price })),
+            selectedAddons: selectedAddons.map(addon => ({ _id: addon._id, AddOnName: addon.AddOnName, price: addon.price* quantity })),
             OrderTableType: route.params.navigationSource,
             username: username,
-            Count: quantity // Use quantity here if needed
+            Count: quantity 
         };
 
 
@@ -89,7 +89,7 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
         const addonTotal = addons.reduce((total, addon, index) => {
             return total + (checkedItems[index] ? addon.price : 0);
         }, 0);
-        return (selectedMenuItem.price * quantity) + addonTotal;
+        return (selectedMenuItem.price * quantity) + addonTotal* quantity;
     };
 
 

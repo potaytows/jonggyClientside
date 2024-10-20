@@ -69,11 +69,9 @@ const MenuList = ({ route, navigation }) => {
 
     const totalItems = cartItems.reduce((total, item) => total + (item.Count || 0), 0);
     const totalPrice = cartItems.reduce((total, item) => {
-        // Base price from the selected menu item
         let itemTotal = item.selectedMenuItem.price * (item.Count || 0);
-        // Add price of addons
         const addonsTotal = item.selectedAddons.reduce((addonTotal, addon) => addonTotal + addon.price, 0);
-        return total + itemTotal + (addonsTotal * (item.Count || 0)); // Multiply addons total by Count if applicable
+        return total + itemTotal + (addonsTotal); // Multiply addons total by Count if applicable
     }, 0);
 
 
@@ -105,9 +103,7 @@ const MenuList = ({ route, navigation }) => {
             <View style={styles.restaurantListContainer}>
 
                 {menuItems && menuItems.map((item, index) => (
-                    <View style={styles.menubox}
-
-                    >
+                    <View style={styles.menubox} key={item._id}>
                         <View style={styles.cardspace}>
                             <View style={styles.card}>
                                 <Image style={styles.logo} source={{ uri: apiheader + '/image/getMenuIcon/' + item._id }} />
@@ -116,7 +112,7 @@ const MenuList = ({ route, navigation }) => {
                                     <View style={styles.flexAddmenu}>
                                         <Text style={styles.price}>฿{item.price}</Text>
                                         <TouchableOpacity style={styles.Addmenu} onPress={() => handleSetAddon(item)}
-                                            key={item._id}>
+                                           >
                                             <AntDesign name="plussquare" size={30} color="#FF914D" />
                                         </TouchableOpacity>
                                     </View>

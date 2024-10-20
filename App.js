@@ -23,6 +23,9 @@ import ChatScreen from './screens/chat';
 import { NotificationProvider } from './screens/notification';
 import FlashMessage from 'react-native-flash-message';
 import SelectTimeScreen from './screens/selectTime';
+import { LinearGradient } from 'expo-linear-gradient';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 const Stack = createStackNavigator();
 
 
@@ -48,31 +51,49 @@ const App = () => {
 
   }, []);
 
+  const CustomHeaderBackground = () => (
+    <LinearGradient
+        colors={['#FB992C', '#EC7A45']}
+        start={{ x: 0.2, y: 0.8 }}
+        style={{
+            paddingTop: 90,
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+           
+        }}
+    />
+);
   return (
     <NavigationContainer>
-      <NotificationProvider>
+        <NotificationProvider>
         <Stack.Navigator
-          screenOptions={{
-            headerStyle: { backgroundColor: '#ff8a24' },
-            headerTintColor: 'white',
-            headerTitleAlign: 'center'
-          }}>
+            screenOptions={{
+                headerBackground: () => <CustomHeaderBackground />, 
+                headerTintColor: 'white',
+                headerTitleAlign: 'center',
+                headerTitleStyle: { fontSize:25, paddingTop: 10,}, 
+                headerBackImage: () => (
+                  <Ionicons name="chevron-back" size={40} color="white" style={{paddingTop: 10,}}/>
+              ),
+              headerBackTitleVisible: false,
+            }}
+        >
           <Stack.Screen name="tab" component={Tabs} options={{ headerShown: false }} />
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name='profile' component={ProfileScreen} options={{ headerShown: false }} />
-          <Stack.Screen name='reserve' component={ReservationScreen} />
+          <Stack.Screen name='reserve' component={ReservationScreen} options={{ title: 'รายการที่เลือก' }} />
           <Stack.Screen name='EditProfile' component={EditProfileScreen} />
           <Stack.Screen name='forgotPassword' component={PasswordResetScreen} />
           <Stack.Screen name='editPassword' component={PasswordNewScreen} />
           <Stack.Screen name='OTPVerification' component={OTPVerificationScreen} />
-          <Stack.Screen name='menuTable' component={MenuTableScreen} />
+          <Stack.Screen name='menuTable' component={MenuTableScreen} options={{ title: 'เลือกการจัดเสริฟ' }}/>
           <Stack.Screen name='menuList' component={MenuListScreen} />
-          <Stack.Screen name='chooseTable' component={MenuChooseTableScreen} />
+          <Stack.Screen name='chooseTable' component={MenuChooseTableScreen} options={{ title: 'เลือกโต๊ะ' }}/>
           <Stack.Screen name='menuAddon' component={MenuAddonScreen} />
           <Stack.Screen name='reservationList' component={ReservationListScreen} />
-          <Stack.Screen name='reservationDetail' component={ReservationDetailScreen} />
+          <Stack.Screen name='reservationDetail' component={ReservationDetailScreen} options={{ title: 'รายการจองของคุณ' }} />
           <Stack.Screen name='Chat' component={ChatScreen} />
           <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
           <Stack.Screen name='selecttime' component={SelectTimeScreen} />

@@ -15,7 +15,7 @@ const ReservationScreen = ({ navigation, route }) => {
     const [restaurantDetails, setRestaurantDetails] = useState(null);
     const [selectedTables, setSelectedTables] = useState([]);
     const [cartItems, setCartItems] = useState([]);
-    
+
 
 
 
@@ -60,30 +60,35 @@ const ReservationScreen = ({ navigation, route }) => {
         try {
             const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
             const result = await response.data;
-            
+
         } catch (error) {
             console.error(error);
         }
     };
 
     const fetchReserveTables = async () => {
-        console.log(selectedTables)
         try {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username
-            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id}
+            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id }
             const response = await axios.post(apiheader + '/reservation/reserveTables/', obj);
             const result = await response.data;
-            if(result.status=="reserved succesfully"){
-                ToastAndroid.showWithGravityAndOffset('จองเสร็จสิ้น!.',ToastAndroid.LONG,ToastAndroid.BOTTOM,25,50)
+            if (result.status == "reserved succesfully") {
+                ToastAndroid.showWithGravityAndOffset('จองเสร็จสิ้น!.', ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50)
                 navigation.navigate('tab');
-                
+
 
             }
         } catch (error) {
             console.error(error);
         }
     };
+
+    const totalPrice = cartItems.reduce((total, item) => {
+        let itemTotal = item.selectedMenuItem.price * (item.Count || 0);
+        const addonsTotal = item.selectedAddons.reduce((addonTotal, addon) => addonTotal + addon.price, 0);
+        return total + itemTotal + (addonsTotal); // Multiply addons total by Count if applicable
+    }, 0);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -179,7 +184,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                                     <Text style={styles.Ui}>{item.totalPrice}</Text>
                                                 </View>
                                                 <View style={styles.MenuLi4}>
-                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id);fetchCart(); }}>
+                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id); fetchCart(); }}>
                                                         <Text style={styles.Delete}>ลบ</Text>
                                                     </TouchableOpacity>
                                                 </View>
@@ -188,9 +193,14 @@ const ReservationScreen = ({ navigation, route }) => {
                                     ))}
                                 </View>
                             </View>
+
                         </View>
                     ))
+
                 )}
+                <View style={styles.total}>
+                    <Text style={styles.totalPrice}>ราคารวม {totalPrice}</Text>
+                </View>
             </ScrollView>
 
             <TouchableOpacity style={styles.buttonReserve} onPress={() => { fetchReserveTables() }} >
@@ -233,10 +243,14 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 10,
         fontWeight: 'bold',
+        fontSize:20,
+        color:'#FF914D'
+
     },
     selectedTables: {
         marginLeft: 20,
         marginTop: 5,
+        fontSize:16
     },
     button: {
         backgroundColor: '#FF914D',
@@ -289,7 +303,8 @@ const styles = StyleSheet.create({
 
     },
     Ui: {
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize:16
     },
     Delete: {
         textAlign: 'right',
@@ -300,13 +315,25 @@ const styles = StyleSheet.create({
 
     },
     menuNameTitle: {
-        width: '60%'
+        width: '60%',
+        fontSize:16
+
     },
     addonTitle: {
-        color: 'grey'
+        color: 'grey',
+        fontSize:16
+
     },
     listContainer: {
         marginTop: 15
+    },
+    total:{
+        marginLeft:'auto',
+        marginRight:20,
+        marginTop:20
+    },
+    totalPrice:{
+        fontSize:20
     }
 });
 
