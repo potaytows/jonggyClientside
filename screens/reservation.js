@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image';
 import _ from 'lodash';
 import { useFocusEffect } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
+import Text from '../component/Text';
 
 
 
@@ -120,9 +121,9 @@ const ReservationScreen = ({ navigation, route }) => {
                         <Text style={styles.selectedTables}>
                             {selectedTables.map((item, index) => (
                                 index === selectedTables.length - 1 ? (
-                                    <Text key={index}>{item.tableName}</Text>
+                                    <Text key={index}>{item.text}</Text>
                                 ) : (
-                                    <Text key={index}>{item.tableName}, </Text>
+                                    <Text key={index}>{item.text}, </Text>
                                 )
                             ))}
                         </Text>
@@ -149,7 +150,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                             {index === 0 && (
                                                 <View style={styles.listContainer}>
                                                     <Text style={styles.tableTitle}> {item.selectedTables.length > 1 ?
-                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.tableName}</Text>)}
+                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.text}</Text>)}
                                                     </Text>
                                                     <View style={styles.MenuTitle}>
 

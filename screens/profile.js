@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Text from '../component/Text';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 

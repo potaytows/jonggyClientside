@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert ,Modal} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Alert ,Modal} from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import Directions from 'react-native-maps-directions';
 import axios from 'axios';
 import io from 'socket.io-client';
+import Text from '../component/Text';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const socket = io(apiheader);
@@ -140,7 +141,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                             <Text style={styles.timeList}> {formatDate(reservation.createdAt)}</Text>
                         </View>
                         <Text>รหัสการจอง: {reservation._id}</Text>
-                        <Text>โต๊ะ: {reservation.reservedTables.map(table => table.tableName).join(', ')}</Text>
+                        <Text>โต๊ะ: {reservation.reservedTables.map(table => table.text).join(', ')}</Text>
                         <Text style={[styles.statusres,
                         reservation.status === "ยืนยันแล้ว" && { color: 'green' },
                         reservation.status === "ยกเลิกการจองแล้ว" && { color: 'red' }]}>{reservation.status}</Text>

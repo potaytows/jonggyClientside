@@ -25,13 +25,22 @@ import FlashMessage from 'react-native-flash-message';
 import SelectTimeScreen from './screens/selectTime';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as SplashScreen from 'expo-splash-screen';
+import { LogBox } from 'react-native';
+import { useFonts } from 'expo-font';
+
 
 const Stack = createStackNavigator();
 
 
-
+LogBox.ignoreLogs(['Warning: ...']);
+LogBox.ignoreAllLogs();
+SplashScreen.preventAutoHideAsync();
 const App = () => {
   const [UserAuth, setUserAuth] = useState((""));
+  const [loaded, error] = useFonts({
+    'Kanit-Regular': require('./assets/fonts/Kanit-Regular.ttf'),
+  });
 
 
   const getLoginInformation = async () => {
@@ -50,6 +59,16 @@ const App = () => {
 
 
   }, []);
+   
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
 
   const CustomHeaderBackground = () => (
     <LinearGradient

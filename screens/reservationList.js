@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, ScrollView, Image } from 'react-native';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import Text from '../component/Text';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -88,7 +88,7 @@ const ReservationListScreen = ({ route, navigation }) => {
                                 tintColor={"gray"}
 
                             />
-                            <Text style={styles.tableList}>{item.reservedTables.map(table => table.tableName).join(', ')}</Text>
+                            <Text style={styles.tableList}>{item.reservedTables.map(table => table.text).join(', ')}</Text>
                         </View>
 
                         <View style={styles.flexListss}>

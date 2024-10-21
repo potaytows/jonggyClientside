@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useRoute } from '@react-navigation/native';
+import Text from '../component/Text';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -33,7 +34,7 @@ const MenuChooseTableScreen = ({ route, navigation }) => {
                                 style={styles.button}
                                 onPress={() => handleMenuChooseTable(item)}
                             >
-                                <Text style={styles.textChooseTable}>{item.tableName}</Text>
+                                <Text style={styles.textChooseTable}>{item.text}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Pressable } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, Alert, Pressable } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Text from '../component/Text';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 

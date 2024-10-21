@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
 import axios from 'axios';
 import { useRoute } from '@react-navigation/native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MenuAddonScreen from './menuAddon';
 import { useFocusEffect } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
+import Text from '../component/Text';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -86,7 +87,7 @@ const MenuList = ({ route, navigation }) => {
                     {route.params.navigationSource === 'SingleTable' ? (
 
                         <Text style={styles.selectedTablesText}>
-                            โต๊ะ {selectedTables.map((table) => table.tableName).join(', ')}
+                            โต๊ะ {selectedTables.map((table) => table.text).join(', ')}
                         </Text>
                     ) : null}
 

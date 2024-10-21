@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 import * as SecureStore from 'expo-secure-store';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from '@react-navigation/native';
+import Text from '../component/Text';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -55,7 +56,7 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
         const username = login.username
         const cartData = {
             restaurantId: route.params.restaurantId,
-            selectedTables: selectedTables.map(table => ({ _id: table._id, tableName: table.tableName })),
+            selectedTables: selectedTables.map(table => ({ _id: table._id, text: table.text })),
             selectedMenuItem: {
                 _id: selectedMenuItem._id,
                 menuName: selectedMenuItem.menuName,

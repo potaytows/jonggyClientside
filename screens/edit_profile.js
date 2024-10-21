@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert} from 'react-native';
+import { View, Button, StyleSheet, TextInput, Alert} from 'react-native';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import Text from '../component/Text';
+
 
 
 

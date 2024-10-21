@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
+import Text from '../component/Text';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -125,7 +126,7 @@ const HomeScreen = ({ navigation }) => {
                       <View style={styles.searchtext}>
                         <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
                         <Text style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.searchdistant}>0.7 km</Text>
+                        <Text style={styles.searchdistant}>ระยะทาง</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -152,7 +153,7 @@ const HomeScreen = ({ navigation }) => {
                       <View style={styles.text}>
                         <Text style={styles.restaurantName}>{item.restaurantName}</Text>
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.distant}>0.7 km</Text>
+                        <Text style={styles.distant}>ระยะทาง km</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -182,7 +183,7 @@ const HomeScreen = ({ navigation }) => {
                       <View style={styles.text}>
                         <Text style={styles.restaurantName}>{item.restaurantName}</Text>
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.distant}>0.7 km</Text>
+                        <Text style={styles.distant}>ระยะทาง km</Text>
                       </View>
 
                     </View>
@@ -208,7 +209,7 @@ const HomeScreen = ({ navigation }) => {
                       <View style={styles.searchtext}>
                         <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
                         <Text style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.searchdistant}>0.7 km</Text>
+                        <Text style={styles.searchdistant}>ระยะทาง km</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -235,6 +236,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'white'
   },
   header: {
     width: '100%',

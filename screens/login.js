@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, AsyncStorage, Alert,Toast } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, Image, AsyncStorage, Alert,Toast } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
+import Text from '../component/Text';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 

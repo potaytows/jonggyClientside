@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image'
@@ -7,6 +7,8 @@ import _ from 'lodash';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Text from '../component/Text';
+import StaticTable from '../component/staticTable';
 
 function Menucontains(arr, key, val) {
 
@@ -78,25 +80,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   };
   function compareObjs(obj1, obj2) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
-  }
-  const contains = (arr, val) => {
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i] === val) {
-        return true;
-      }
-    }
-
-    return false;
-
-  }
-  const addSelected = (val) => {
-    setSelected((old) => [...old, val])
-    // ToastAndroid.showWithGravityAndOffset('Selected ' + val.tableName, ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, 50)
-  }
-  const removeSelected = (val) => {
-    setSelected((old) => old.filter((tables) => tables !== val))
-    // ToastAndroid.showWithGravityAndOffset('Deselected ' + val.tableName, ToastAndroid.SHORT, ToastAndroid.BOTTOM, 25, 50)
-
   }
 
   const getTables = async () => {
@@ -214,22 +197,22 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
             <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
 
           </View>
-          <View  style={styles.layoutGuid}>
-          <View style={styles.flexGuid}>
-            <FontAwesome name="circle" size={24} color="#FF7A00" />
-            <Text style={styles.statusGuid}>ว่าง</Text>
+          <View style={styles.layoutGuid}>
+            <View style={styles.flexGuid}>
+              <FontAwesome name="circle" size={24} color="#FF7A00" />
+              <Text style={styles.statusGuid}>ว่าง</Text>
 
-            <FontAwesome name="circle" size={24} color="#C3F9C9" />
-            <Text style={styles.statusGuid}>เลือก</Text>
+              <FontAwesome name="circle" size={24} color="#C3F9C9" />
+              <Text style={styles.statusGuid}>เลือก</Text>
 
-            <FontAwesome name="circle" size={24} color="gray" />
-            <Text style={styles.statusGuid}>เต็ม</Text>
+              <FontAwesome name="circle" size={24} color="gray" />
+              <Text style={styles.statusGuid}>เต็ม</Text>
 
-          </View>
+            </View>
           </View>
           <View style={styles.dragablecontainer}>
             {obj.map((item, index) => (
-              <TableComponent item={item} key={index} />
+              <StaticTable item={item} key={index} selected={selected} setSelected={setSelected}/>
             ))}
           </View>
           <View style={styles.requestContainer} >
@@ -333,15 +316,16 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   dragablecontainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: "100%",
+    width: 380,
     height: 450,
     alignSelf: 'center',
-    marginVertical: 20,
-    borderBottomColor: 'gray',
-    borderBottomWidth: 1,
-    backgroundColor: 'white'
+    marginTop: 40,
+    borderWidth: 2,
+    borderRadius: 5,
+    marginBottom: 20,
+    backgroundColor: 'white',
+    borderColor: '#CCCCCC',
+    overflow: 'hidden'
 
   },
   tablecontainer: {
@@ -374,25 +358,25 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30
   },
-  layoutGuid:{
-    flex:1,
-    alignSelf:'flex-end',
-    marginLeft:10,
-    marginRight:10
+  layoutGuid: {
+    flex: 1,
+    alignSelf: 'flex-end',
+    marginLeft: 10,
+    marginRight: 10
   },
   flexGuid: {
-    marginTop:15,
+    marginTop: 15,
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: 'gray',
     alignItems: 'center',
     padding: 10,
-   borderRadius:10
+    borderRadius: 10
 
   },
-  statusGuid:{
-    marginLeft:10,
-    marginRight:10
+  statusGuid: {
+    marginLeft: 10,
+    marginRight: 10
   }
 
 
