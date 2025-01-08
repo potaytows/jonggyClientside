@@ -1,23 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import AutoHeightImage from 'react-native-auto-height-image';
+import io from 'socket.io-client';
 import _ from 'lodash';
 import { useFocusEffect } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Text from '../component/Text';
-
+import * as ImagePicker from 'expo-image-picker';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
+const socket = io(apiheader);
 
 const ReservationScreen = ({ navigation, route }) => {
     const [request, setRequest] = useState('');
     const [restaurantDetails, setRestaurantDetails] = useState(null);
     const [selectedTables, setSelectedTables] = useState([]);
     const [cartItems, setCartItems] = useState([]);
+    const [qrCode, setQrCode] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadResult, setUploadResult] = useState(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [error, setError] = useState(null);
 
+    const selectImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: false,
+            quality: 1,
+        });
 
+        if (!result.canceled) {
+            setSelectedImage(result.assets[0].uri);
+        }
+    };
+    const uploadSlip = async () => {
+        if (!selectedImage) return;
+
+        try {
+            setUploading(true); // แสดงสถานะกำลังอัปโหลด
+            setUploadResult(null); // ล้างข้อความเก่า
+            setError(null); // ล้างข้อความข้อผิดพลาดเก่า
+
+            const fileBuffer = await fetch(selectedImage).then((res) => res.arrayBuffer());
+            const fileName = selectedImage.split('/').pop();
+            const totalP = totalPrice;
+            const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+            const username = login.username;
+
+            // ส่งข้อมูลไปที่ Socket
+            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username });
+
+            // ฟังผลลัพธ์สำเร็จ
+            socket.on('uploadSlipSuccess', (response) => {
+                setUploading(false);
+                setUploadResult(`Success: ${response.message}`);
+            });
+
+            // ฟังผลลัพธ์ข้อผิดพลาด
+            socket.on('uploadSlipError', (error) => {
+                setUploading(false);
+                setError(`Error: ${error.message}`);
+            });
+        } catch (e) {
+            setUploading(false);
+            setError(`Error: ${e.message}`);
+        }
+    };
 
 
     const handleGetMenu = () => {
@@ -31,7 +83,6 @@ const ReservationScreen = ({ navigation, route }) => {
     const fetchRestaurantDetails = async () => {
         try {
             if (route.params && route.params.restaurantId) {
-
                 const response = await axios.get(apiheader + '/restaurants/' + route.params.restaurantId);
                 const result = await response.data;
                 setRestaurantDetails(result);
@@ -67,29 +118,48 @@ const ReservationScreen = ({ navigation, route }) => {
         }
     };
 
+
+
+
     const fetchReserveTables = async () => {
+        if (isProcessing) return; // ป้องกันการกดซ้ำ
+        setIsProcessing(true);
         try {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username
             const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id }
             const response = await axios.post(apiheader + '/reservation/reserveTables/', obj);
             const result = await response.data;
-            if (result.status == "reserved succesfully") {
-                ToastAndroid.showWithGravityAndOffset('จองเสร็จสิ้น!.', ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50)
-                navigation.navigate('tab');
-
-
+            if (result.status == "reserved successfully") {
+                const totalP = totalPrice;
+                try {
+                    const response = await axios.post(apiheader + '/payment/createQRpayment', {
+                        amount: totalP,
+                    });
+                    if (response.data.qrCodeUrl) {
+                        setQrCode(response.data.qrCodeUrl);
+                    } else {
+                        console.error('Error generating QR Code');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
             }
         } catch (error) {
             console.error(error);
+
+        } finally {
+            setIsProcessing(false); // คืนสถานะให้สามารถกดได้อีกครั้ง
         }
     };
 
     const totalPrice = cartItems.reduce((total, item) => {
         let itemTotal = item.selectedMenuItem.price * (item.Count || 0);
         const addonsTotal = item.selectedAddons.reduce((addonTotal, addon) => addonTotal + addon.price, 0);
-        return total + itemTotal + (addonsTotal); // Multiply addons total by Count if applicable
+        return total + itemTotal + (addonsTotal);
     }, 0);
+
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -121,9 +191,9 @@ const ReservationScreen = ({ navigation, route }) => {
                         <Text style={styles.selectedTables}>
                             {selectedTables.map((item, index) => (
                                 index === selectedTables.length - 1 ? (
-                                    <Text key={index}>{item.text}</Text>
+                                    <Text key={index}>{item.tableName}</Text>
                                 ) : (
-                                    <Text key={index}>{item.text}, </Text>
+                                    <Text key={index}>{item.tableName}, </Text>
                                 )
                             ))}
                         </Text>
@@ -150,7 +220,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                             {index === 0 && (
                                                 <View style={styles.listContainer}>
                                                     <Text style={styles.tableTitle}> {item.selectedTables.length > 1 ?
-                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.text}</Text>)}
+                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.tableName}</Text>)}
                                                     </Text>
                                                     <View style={styles.MenuTitle}>
 
@@ -194,18 +264,78 @@ const ReservationScreen = ({ navigation, route }) => {
                                     ))}
                                 </View>
                             </View>
+                            <View style={styles.total}>
+                                <Text style={styles.totalPrice}>ราคารวม {totalPrice}</Text>
+                            </View>
+                            <View style={styles.Promotion}>
+                                <Text style={styles.TextPromotion1}>คูปอง</Text>
+                                <TouchableOpacity style={styles.chickTops}>
+                                    <Text style={styles.TextPromotion2}>ใช้คูปอง</Text>
+                                    <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.payment}>
+                                <Text style={styles.TextPromotion1}>ชำระเงินโดย</Text>
+                                <TouchableOpacity style={styles.LayoutPayment}>
+                                    <MaterialIcons name="qr-code-2" size={35} color="black" width='10%' />
+                                    <Text style={styles.TextPayment}>ชำระผ่าน QR code</Text>
+                                    <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginRight={10} marginLeft='auto' />
+                                </TouchableOpacity>
+                            </View>
+                            {qrCode && (
+                                <View style={styles.QRcode}>
+                                    <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
+                                    <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
 
+
+                                    <View>
+                                        {selectedImage && (
+                                            <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
+                                        )}
+
+                                        <Text style={styles.QRcodeDec}>เมื่อชำระเงินแล้วทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบสลิป" หากตรวจสอบเสร็จสิ้นจะขึ้นสถานะว่า "ผ่านการตรวจสอบ" แล้วจึงจะสามารถกดยืนยันการจองได้</Text>
+                                        <View style={styles.flexButton}>
+                                            <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
+                                                <Text style={styles.SlipTxt}>ส่งสลิป</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={uploadSlip}
+                                                style={styles.verifySlip}
+                                            >
+
+                                                {uploading && <ActivityIndicator size="large" color="#0000ff" />}
+
+                                                {uploadResult && (
+                                                    <Text style={styles.successText}>{uploadResult}</Text>
+                                                )}
+
+                                                {error && (
+                                                    <Text style={styles.errorText}>{error}</Text>
+                                                )}
+
+                                                <Text style={styles.SlipTxt}>Upload Slip</Text>
+                                            </TouchableOpacity>
+
+                                        </View>
+                                    </View>
+                                </View>
+
+
+                            )}
                         </View>
                     ))
 
                 )}
-                <View style={styles.total}>
-                    <Text style={styles.totalPrice}>ราคารวม {totalPrice}</Text>
-                </View>
+
             </ScrollView>
 
-            <TouchableOpacity style={styles.buttonReserve} onPress={() => { fetchReserveTables() }} >
-                <Text style={styles.buttonText}>ยืนยันการจอง</Text>
+            <TouchableOpacity
+                style={[styles.buttonReserve, { backgroundColor: cartItems.length > 0 ? '#FF914D' : 'gray' }]}
+                onPress={() => { fetchReserveTables() }}
+                disabled={cartItems.length === 0 || isProcessing}
+            >
+                <Text style={styles.buttonText}>
+                    {isProcessing ? 'กำลังดำเนินการ...' : 'ยืนยันการจอง'}
+                </Text>
             </TouchableOpacity>
         </View>
     );
@@ -244,14 +374,14 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 10,
         fontWeight: 'bold',
-        fontSize:20,
-        color:'#FF914D'
+        fontSize: 20,
+        color: '#FF914D'
 
     },
     selectedTables: {
         marginLeft: 20,
         marginTop: 5,
-        fontSize:16
+        fontSize: 16
     },
     button: {
         backgroundColor: '#FF914D',
@@ -301,11 +431,10 @@ const styles = StyleSheet.create({
     },
     MenuLi4: {
         flex: 1,
-
     },
     Ui: {
         textAlign: 'center',
-        fontSize:16
+        fontSize: 16
     },
     Delete: {
         textAlign: 'right',
@@ -317,24 +446,104 @@ const styles = StyleSheet.create({
     },
     menuNameTitle: {
         width: '60%',
-        fontSize:16
+        fontSize: 16
 
     },
     addonTitle: {
         color: 'grey',
-        fontSize:16
+        fontSize: 16
 
     },
     listContainer: {
         marginTop: 15
     },
-    total:{
-        marginLeft:'auto',
-        marginRight:20,
-        marginTop:20
+    total: {
+        marginTop: 20,
+        marginBottom: 10
     },
-    totalPrice:{
-        fontSize:20
+    totalPrice: {
+        fontSize: 18,
+        textAlign: 'right',
+        marginRight: 20,
+
+    },
+    payment: {
+        borderTopColor: 'gray',
+        borderTopWidth: 1
+    },
+    LayoutPayment: {
+        flexDirection: 'row',
+        marginLeft: 20,
+        marginTop: 5
+    },
+    TextPayment: {
+        alignSelf: 'center',
+        fontSize: 16
+    },
+    Promotion: {
+        flexDirection: 'row',
+        borderTopColor: 'gray',
+        borderTopWidth: 5,
+        marginBottom: 10
+
+    },
+    TextPromotion1: {
+        flex: 1,
+        marginTop: 10,
+        marginLeft: 20,
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    chickTops: {
+        flexDirection: 'row'
+    },
+    TextPromotion2: {
+        marginTop: 10,
+        color: 'gray'
+    },
+    QRcode: {
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginBottom: 60
+    },
+    QRcodeimg: {
+        width: 200,
+        height: 200,
+        margin: 'auto'
+    },
+    QRcodeTitle: {
+        textAlign: 'center',
+        fontSize: 18
+    },
+    flexButton: {
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    sendSlip: {
+        backgroundColor: 'green',
+        width: '30%',
+        padding: 10,
+        margin: 5,
+        borderRadius: 10
+    },
+    verifySlip: {
+        backgroundColor: 'orange',
+        width: '30%',
+        padding: 10,
+        margin: 5,
+        borderRadius: 10
+
+    },
+    SlipTxt: {
+        fontSize: 16,
+        color: 'white',
+        textAlign: 'center'
+    },
+    QRcodeDec: {
+        marginLeft: 20,
+        marginRight: 20,
+        fontSize: 15,
+        color: 'red'
     }
 });
 

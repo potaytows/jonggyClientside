@@ -24,19 +24,19 @@ const table = ({ item, selected,setSelected}) => {
     const styles = StyleSheet.create({
         container: {
             left: item.x,
-            top: item.y,
-            alignItems: 'center',
-            justifyContent: 'center',
+            top: item.y,    
             position: 'absolute'
         },
         text: {
             color: 'black',
         },
         image: {
-            height: 30,
+            height: 30, 
             width: 30
         }, shape: {
-            backgroundColor: "orange"
+            backgroundColor: "orange",
+            position: 'absolute'
+            
         }
     });
 
