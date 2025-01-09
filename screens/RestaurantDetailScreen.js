@@ -86,7 +86,8 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     try {
       const response = await axios.get(apiheader + '/tables/getbyRestaurantId/' + route.params.restaurantId);
       const result = await response.data;
-      setData(result)
+      console.log(result)
+      setData(result.activePreset || []);
     } catch (error) {
       console.error(error);
     }
@@ -211,7 +212,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
             </View>
           </View>
           <View style={styles.dragablecontainer}>
-            {obj.map((item, index) => (
+            {obj.tables.map((item, index) => (
               <StaticTable item={item} key={index} selected={selected} setSelected={setSelected}/>
             ))}
           </View>
