@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Text from './Text';
 
 const table = ({ item, selected,setSelected}) => {
     const contains = (arr, val) => {
@@ -29,6 +30,7 @@ const table = ({ item, selected,setSelected}) => {
         },
         text: {
             color: 'black',
+            textAlign:'center'
         },
         image: {
             height: 30, 

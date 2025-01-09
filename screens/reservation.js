@@ -191,9 +191,9 @@ const ReservationScreen = ({ navigation, route }) => {
                         <Text style={styles.selectedTables}>
                             {selectedTables.map((item, index) => (
                                 index === selectedTables.length - 1 ? (
-                                    <Text key={index}>{item.tableName}</Text>
+                                    <Text key={index}>{item.text}</Text>
                                 ) : (
-                                    <Text key={index}>{item.tableName}, </Text>
+                                    <Text key={index}>{item.text}, </Text>
                                 )
                             ))}
                         </Text>
@@ -331,7 +331,10 @@ const ReservationScreen = ({ navigation, route }) => {
             <TouchableOpacity
                 style={[styles.buttonReserve, { backgroundColor: cartItems.length > 0 ? '#FF914D' : 'gray' }]}
                 onPress={() => { fetchReserveTables() }}
-                disabled={cartItems.length === 0 || isProcessing}
+                disabled={
+                    cartItems.length === 0 ||
+                    
+                     isProcessing}
             >
                 <Text style={styles.buttonText}>
                     {isProcessing ? 'กำลังดำเนินการ...' : 'ยืนยันการจอง'}

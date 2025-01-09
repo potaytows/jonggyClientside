@@ -103,15 +103,15 @@ const App = () => {
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name='profile' component={ProfileScreen} options={{ headerShown: false }} />
           <Stack.Screen name='reserve' component={ReservationScreen} options={{ title: 'รายการที่เลือก' }} />
-          <Stack.Screen name='EditProfile' component={EditProfileScreen} />
-          <Stack.Screen name='forgotPassword' component={PasswordResetScreen} />
-          <Stack.Screen name='editPassword' component={PasswordNewScreen} />
-          <Stack.Screen name='OTPVerification' component={OTPVerificationScreen} />
+          <Stack.Screen name='EditProfile' component={EditProfileScreen} options={{ title: 'แก้ไขข้อมูล' }}/>
+          <Stack.Screen name='forgotPassword' component={PasswordResetScreen} options={{ title: '' }} />
+          <Stack.Screen name='editPassword' component={PasswordNewScreen} options={{ title: 'รหัสผ่านใหม่' }}/>
+          <Stack.Screen name='OTPVerification' component={OTPVerificationScreen} options={{ title: 'OTP Verification' }}/>
           <Stack.Screen name='menuTable' component={MenuTableScreen} options={{ title: 'เลือกการจัดเสริฟ' }}/>
-          <Stack.Screen name='menuList' component={MenuListScreen} />
+          <Stack.Screen name='menuList' component={MenuListScreen} options={{ title: 'เมนู' }} />
           <Stack.Screen name='chooseTable' component={MenuChooseTableScreen} options={{ title: 'เลือกโต๊ะ' }}/>
-          <Stack.Screen name='menuAddon' component={MenuAddonScreen} />
-          <Stack.Screen name='reservationList' component={ReservationListScreen} />
+          <Stack.Screen name='menuAddon' component={MenuAddonScreen} options={{ title: 'แอดออน' }} />
+          <Stack.Screen name='reservationList' component={ReservationListScreen} options={{ title: 'รายการจอง' }} />
           <Stack.Screen name='reservationDetail' component={ReservationDetailScreen} options={{ title: 'รายการจองของคุณ' }} />
           <Stack.Screen name='Chat' component={ChatScreen} />
           <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />

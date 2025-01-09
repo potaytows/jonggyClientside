@@ -106,7 +106,7 @@ const MenuList = ({ route, navigation }) => {
                     <View style={styles.menubox} key={item._id}>
                         <View style={styles.cardspace}>
                             <View style={styles.card}>
-                                <Image style={styles.logo} source={{ uri: apiheader + '/image/getMenuIcon/' + item._id }} />
+                                <Image style={styles.logo} source={{ uri: apiheader + '/image/getMenuIcon/' + item._id+"/"+Math.round(Math.random()*1000000000).toString() }} />
                                 <View style={styles.menuItem}>
                                     <Text style={styles.menuName}>{item.menuName}</Text>
                                     <View style={styles.flexAddmenu}>
