@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, Image, AsyncStorage, Alert,Toast } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, Image, AsyncStorage, Alert, Toast } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import Text from '../component/Text';
@@ -40,6 +40,12 @@ const LoginScreen = ({ navigation }) => {
                 setTimeout(() => {
                     navigation.navigate('tab');
                 }, 200);
+            } if (response.data.status == "banned") {
+                Alert.alert('บัญชีของคุณถูกระงับการใช้งาน', 'บัญชีของคุณได้ถูกระงับการใช้งานชั่วคราว กรุณาติดต่ออีเมลล์ takachi.y@kkumail.com', [
+                    {
+                        text: 'ตกลง',
+                    },
+                ]);
             } else {
                 setUsernameNotFound(true);
                 setPasswordNotFound(true);
@@ -81,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
                     secureTextEntry
                 />
                 {usernameNotFound && passwordNotFound && <Text style={styles.errorText}>ไม่พบชื่อผู้ใช้ดังกล่าว</Text>}
-                
+
 
                 <TouchableOpacity style={styles.buttonwellcome} onPress={handleForgotPassword}>
                     <Text style={styles.textbutton}>ลืมรหัสผ่าน</Text>

@@ -3,6 +3,7 @@
     "name": "JongyClientSide",
     "slug": "JongyClientSide",
     "version": "1.0.0",
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/Jonggylogo.png",
     "userInterfaceStyle": "light",

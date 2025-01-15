@@ -4,6 +4,8 @@ import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button,
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import Text from '../component/Text';
+import * as SecureStore from 'expo-secure-store';
+
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
@@ -37,6 +39,22 @@ const HomeScreen = ({ navigation }) => {
     }
 
   };
+  const getUserDetail = async () => {
+    const userCredentials = await SecureStore.getItemAsync('userCredentials');
+    const { username } = JSON.parse(userCredentials);
+    try {
+      const response = await axios.get(apiheader + '/users/getusers/' + username)
+      const result = await response.data;
+      if (result?.isBanned== true) {
+        await SecureStore.deleteItemAsync('userCredentials');
+        navigation.navigate('Login');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+
+  };
 
   useEffect(() => {
     fetchRestaurants();
@@ -44,6 +62,8 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchRestaurants();
+    getUserDetail();
+
   }, []);
 
   useEffect(() => {
@@ -53,13 +73,13 @@ const HomeScreen = ({ navigation }) => {
           prevIndex === restaurants.length - 1 ? 0 : prevIndex + 1
         );
         scrollRef.current?.scrollTo({
-          x: currentIndex * 400, 
+          x: currentIndex * 400,
           animated: true,
         });
       }
-    }, 5000); 
+    }, 5000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [currentIndex, restaurants]);
 
   return (
@@ -92,18 +112,18 @@ const HomeScreen = ({ navigation }) => {
         {searchQuery === '' && (
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} ref={scrollRef}>
-              <TouchableOpacity style={styles.promotioncard}>
-                <Image style={styles.promotions} source={require('../assets/images/pmtss1.png')} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.promotioncard}>
-                <Image style={styles.promotions} source={require('../assets/images/pms2.png')} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.promotioncard}>
-                <Image style={styles.promotions} source={require('../assets/images/pms3.png')} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.promotioncard}>
-                <Image style={styles.promotions} source={require('../assets/images/pms4.png')} />
-              </TouchableOpacity>
+            <TouchableOpacity style={styles.promotioncard}>
+              <Image style={styles.promotions} source={require('../assets/images/pmtss1.png')} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.promotioncard}>
+              <Image style={styles.promotions} source={require('../assets/images/pms2.png')} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.promotioncard}>
+              <Image style={styles.promotions} source={require('../assets/images/pms3.png')} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.promotioncard}>
+              <Image style={styles.promotions} source={require('../assets/images/pms4.png')} />
+            </TouchableOpacity>
           </ScrollView>
 
         )}
@@ -236,7 +256,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'white'
+    backgroundColor: 'white'
   },
   header: {
     width: '100%',
@@ -358,23 +378,23 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     alignSelf: 'center'
   },
-  boxPMS:{
-    borderRadius:20,
+  boxPMS: {
+    borderRadius: 20,
 
   },
   promotioncard: {
-    width:400,
-    height:200,
-    marginLeft:20,
+    width: 400,
+    height: 200,
+    marginLeft: 20,
     justifyContent: 'center',
     alignItems: 'center',
 
   },
   promotions: {
     width: '100%',
-    height:200,
+    height: 200,
     resizeMode: 'cover',
-    borderRadius:10,
+    borderRadius: 10,
 
   },
   pmtsub: {
