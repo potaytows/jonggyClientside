@@ -71,7 +71,7 @@ const MenuList = ({ route, navigation }) => {
     const totalPrice = cartItems.reduce((total, item) => {
         let itemTotal = item.selectedMenuItem.price * (item.Count || 0);
         const addonsTotal = item.selectedAddons.reduce((addonTotal, addon) => addonTotal + addon.price, 0);
-        return total + itemTotal + (addonsTotal); // Multiply addons total by Count if applicable
+        return total + itemTotal + (addonsTotal); 
     }, 0);
 
 

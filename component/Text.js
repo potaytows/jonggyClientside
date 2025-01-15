@@ -8,7 +8,7 @@ const TextComponent =  props => {
     const style = props.style !=undefined ? props.style : {}
 
     return (
-        <Text style={[style,{fontFamily:'Kanit-Regular',}]}>{props.children}</Text>
+        <Text {...props} style={[style,{fontFamily:'Kanit-Regular',}]}>{props.children}</Text>
     );
 };
 

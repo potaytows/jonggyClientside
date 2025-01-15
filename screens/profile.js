@@ -61,7 +61,9 @@ const ProfileScreen = ({ navigation }) => {
       console.error('Error logging out:', error);
     }
   };
-
+  const handleHelpCenter = () => {
+    navigation.navigate('helpCenter');
+};
   return (
     <View style={styles.container}>
       <LinearGradient style={styles.header}
@@ -98,12 +100,10 @@ const ProfileScreen = ({ navigation }) => {
               </TouchableOpacity>
 
               <Text style={styles.textTitle}>ทั่วไป</Text>
-              <TouchableOpacity style={styles.underline} >
+              <TouchableOpacity style={styles.underline} onPress={handleHelpCenter}>
                 <Text style={styles.textchick}>ศูนย์ช่วยเหลือ</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.underline} >
-                <Text style={styles.textchick}>การตั้งค่า</Text>
-              </TouchableOpacity>
+              
 
             </View>
             <TouchableOpacity style={styles.underline} onPress={handleLogout}>

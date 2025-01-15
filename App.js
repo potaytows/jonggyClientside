@@ -28,7 +28,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SplashScreen from 'expo-splash-screen';
 import { LogBox } from 'react-native';
 import { useFonts } from 'expo-font';
-
+import CouponScreen from './screens/coupon';
+import HelpCenterScreen from './screens/helpCenter';
+import SupportFormScreen from './screens/supportForm';
 
 const Stack = createStackNavigator();
 
@@ -116,6 +118,11 @@ const App = () => {
           <Stack.Screen name='Chat' component={ChatScreen} />
           <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
           <Stack.Screen name='selecttime' component={SelectTimeScreen} />
+          <Stack.Screen name='coupon' component={CouponScreen} options={{ title: 'รายการจอง' }} />
+          <Stack.Screen name='helpCenter' component={HelpCenterScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
+          <Stack.Screen name='supportForm' component={SupportFormScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
+
+
         </Stack.Navigator>
         <FlashMessage position="top" />
       </NotificationProvider>

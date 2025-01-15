@@ -30,7 +30,6 @@ const HomeScreen = ({ navigation }) => {
         const response = await axios.get(apiheader + '/restaurants/')
         const result = await response.data;
         setRestaurants(result);
-        console.log(typeof restaurants)
       } catch (error) {
         console.error(error);
       }
@@ -294,6 +293,7 @@ const styles = StyleSheet.create({
   searchtext: {
     flex: 1,
     marginLeft: '3%',
+    
   },
   searchrestaurantName: {
     fontSize: 16
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   text: {
     padding: 10,
-    paddingBottom: 0
+    paddingBottom: 0,
   },
   restaurantName: {
     fontSize: 16,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   restaurantDescription: {
     fontSize: 14,
     color: 'gray',
-    flexWrap: 'wrap'
+    
   },
   distant: {
     marginLeft: 'auto',
