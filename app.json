@@ -1,5 +1,6 @@
 {
   "expo": {
+    "newArchEnabled": true,
     "name": "JongyClientSide",
     "slug": "JongyClientSide",
     "version": "1.0.0",
@@ -38,8 +39,15 @@
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
-        ["expo-font",{
-        "fonts":["/assets/fonts/Kanit-Regular.ttf"]}]
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "/assets/fonts/Kanit-Regular.ttf"
+          ]
+        }
+      ],
+      "expo-secure-store"
     ]
   }
 }

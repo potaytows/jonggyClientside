@@ -86,7 +86,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     try {
       const response = await axios.get(apiheader + '/tables/getbyRestaurantId/' + route.params.restaurantId);
       const result = await response.data;
-      console.log(result)
       setData(result.activePreset || []);
     } catch (error) {
       console.error(error);

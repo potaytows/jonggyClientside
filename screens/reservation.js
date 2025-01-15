@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid, ActivityIndicator, Modal } from 'react-native';
 import axios from 'axios';
 import io from 'socket.io-client';
 import _ from 'lodash';
@@ -25,6 +25,8 @@ const ReservationScreen = ({ navigation, route }) => {
     const [uploadResult, setUploadResult] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
+    const [selectedCoupon, setSelectedCoupon] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const selectImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -57,13 +59,18 @@ const ReservationScreen = ({ navigation, route }) => {
             // ฟังผลลัพธ์สำเร็จ
             socket.on('uploadSlipSuccess', (response) => {
                 setUploading(false);
-                setUploadResult(`Success: ${response.message}`);
+                setUploadResult(`${response.message}`);
+                setModalVisible(true);
+                setTimeout(() => {
+                    setModalVisible(false);
+                    navigation.navigate('tab', { reservation: response.reservationId });
+                }, 5000);
             });
 
             // ฟังผลลัพธ์ข้อผิดพลาด
             socket.on('uploadSlipError', (error) => {
                 setUploading(false);
-                setError(`Error: ${error.message}`);
+                setError(`${error.message}`);
             });
         } catch (e) {
             setUploading(false);
@@ -77,6 +84,12 @@ const ReservationScreen = ({ navigation, route }) => {
             restaurantId: route.params.restaurantId,
             restaurant: restaurantDetails,
             selectedTables: selectedTables,
+        });
+    };
+    const handlePromotion = () => {
+        navigation.navigate('coupon', {
+            restaurantId: route.params.restaurantId,
+            totalPrice: totalPriceBeforeDiscount,
         });
     };
 
@@ -127,7 +140,8 @@ const ReservationScreen = ({ navigation, route }) => {
         try {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username
-            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id }
+            const totalP = totalPrice;
+            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id, total: totalP }
             const response = await axios.post(apiheader + '/reservation/reserveTables/', obj);
             const result = await response.data;
             if (result.status == "reserved successfully") {
@@ -153,12 +167,21 @@ const ReservationScreen = ({ navigation, route }) => {
         }
     };
 
-    const totalPrice = cartItems.reduce((total, item) => {
+
+    useEffect(() => {
+        if (route.params?.selectedCoupon) {
+            setSelectedCoupon(route.params.selectedCoupon);
+        }
+    }, [route.params?.selectedCoupon]);
+
+    const totalPriceBeforeDiscount = cartItems.reduce((total, item) => {
         let itemTotal = item.selectedMenuItem.price * (item.Count || 0);
         const addonsTotal = item.selectedAddons.reduce((addonTotal, addon) => addonTotal + addon.price, 0);
-        return total + itemTotal + (addonsTotal);
+        return total + itemTotal + addonsTotal;
     }, 0);
 
+    const discount = selectedCoupon ? selectedCoupon.discount : 0;
+    const totalPrice = Math.max(totalPriceBeforeDiscount - discount, 0);
 
 
     useFocusEffect(
@@ -265,12 +288,23 @@ const ReservationScreen = ({ navigation, route }) => {
                                 </View>
                             </View>
                             <View style={styles.total}>
-                                <Text style={styles.totalPrice}>ราคารวม {totalPrice}</Text>
+                                <Text style={styles.totalPrice}>ราคารวม ฿{totalPriceBeforeDiscount.toFixed(2)}</Text>
+
+                                {selectedCoupon && (
+                                    <View>
+                                        <View style={styles.flexDiscount}>
+                                            <Text style={styles.discountLabel1}>ส่วนลด ({selectedCoupon.name})</Text>
+                                            <Text style={styles.discountLabel2}> -฿{discount.toFixed(2)}</Text>
+                                        </View>
+                                        <Text style={styles.finalPriceLabel}>ราคาสุทธิ: ฿{totalPrice.toFixed(2)}</Text>
+                                    </View>
+
+                                )}
                             </View>
                             <View style={styles.Promotion}>
                                 <Text style={styles.TextPromotion1}>คูปอง</Text>
-                                <TouchableOpacity style={styles.chickTops}>
-                                    <Text style={styles.TextPromotion2}>ใช้คูปอง</Text>
+                                <TouchableOpacity style={styles.chickTops} onPress={handlePromotion}>
+                                    <Text style={styles.TextPromotion2}> {selectedCoupon ? selectedCoupon.code : 'ใช้คูปอง'}</Text>
                                     <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
                                 </TouchableOpacity>
                             </View>
@@ -293,7 +327,10 @@ const ReservationScreen = ({ navigation, route }) => {
                                             <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
                                         )}
 
-                                        <Text style={styles.QRcodeDec}>เมื่อชำระเงินแล้วทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบสลิป" หากตรวจสอบเสร็จสิ้นจะขึ้นสถานะว่า "ผ่านการตรวจสอบ" แล้วจึงจะสามารถกดยืนยันการจองได้</Text>
+                                        <Text style={styles.QRcodeDec}>การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ" หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น" </Text>
+                                        {error && (
+                                            <Text style={styles.errorText}>{error}</Text>
+                                        )}
                                         <View style={styles.flexButton}>
                                             <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
                                                 <Text style={styles.SlipTxt}>ส่งสลิป</Text>
@@ -301,18 +338,9 @@ const ReservationScreen = ({ navigation, route }) => {
                                             <TouchableOpacity onPress={uploadSlip}
                                                 style={styles.verifySlip}
                                             >
-
-                                                {uploading && <ActivityIndicator size="large" color="#0000ff" />}
-
-                                                {uploadResult && (
-                                                    <Text style={styles.successText}>{uploadResult}</Text>
+                                                {uploading && (<ActivityIndicator size="large" color="#0000ff" />
                                                 )}
-
-                                                {error && (
-                                                    <Text style={styles.errorText}>{error}</Text>
-                                                )}
-
-                                                <Text style={styles.SlipTxt}>Upload Slip</Text>
+                                                <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
                                             </TouchableOpacity>
 
                                         </View>
@@ -325,22 +353,33 @@ const ReservationScreen = ({ navigation, route }) => {
                     ))
 
                 )}
-
             </ScrollView>
-
+            <View style={styles.modal}>
+                <Modal visible={isModalVisible} >
+                    <View style={styles.layoutModal}>
+                        <Image
+                            source={require('../assets/images/invoice.png')}
+                            style={styles.iconModal}
+                        />
+                        <Text style={styles.successText}>{uploadResult}</Text>
+                    </View>
+                </Modal>
+            </View>
             <TouchableOpacity
                 style={[styles.buttonReserve, { backgroundColor: cartItems.length > 0 ? '#FF914D' : 'gray' }]}
                 onPress={() => { fetchReserveTables() }}
                 disabled={
                     cartItems.length === 0 ||
-                    
-                     isProcessing}
+
+                    isProcessing}
             >
                 <Text style={styles.buttonText}>
                     {isProcessing ? 'กำลังดำเนินการ...' : 'ยืนยันการจอง'}
                 </Text>
             </TouchableOpacity>
+          
         </View>
+
     );
 };
 
@@ -546,8 +585,69 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         fontSize: 15,
-        color: 'red'
+        color: 'gray',
+        marginTop: 5
+    },
+    discountLabel1: {
+        flex: 1,
+        fontSize: 16,
+        marginLeft: 20,
+
+    },
+    discountLabel2: {
+        flex: 1,
+        fontSize: 16,
+        color: 'red',
+        textAlign: 'right',
+        marginRight: 20,
+
+    },
+    finalPriceLabel: {
+        fontSize: 18,
+        textAlign: 'right',
+        marginRight: 20,
+        color: 'green',
+        marginTop: 10,
+    },
+    flexDiscount: {
+        flex: 1,
+        flexDirection: 'row'
+    },
+    errorText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 10
+    },
+    layoutModal:{
+        width:300,
+        height:320,
+        position: "absolute",
+        top: '50%',
+        left: '50%',
+        transform: "translate(-50%, -50%)"
+    },
+    iconModal:{
+        width:300,
+        height:300,
+        position: "absolute",
+        top: '30%',
+        left: '50%',
+        transform: "translate(-50%, -50%)"
+    },
+    successText:{
+        fontSize: 25,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign:'center',
+        position: "absolute",
+        bottom: 0,
+        left: '50%',
+        transform: "translate(-50%, -50%)"
     }
+    
+    
 });
 
 export default ReservationScreen;
