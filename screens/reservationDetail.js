@@ -18,7 +18,6 @@ const ReservationDetailScreen = ({ route, navigation }) => {
     const [isMapVisible, setIsMapVisible] = useState(true);
     const reservationID = reservation._id;
     const [showPopup, setShowPopup] = useState(false);
-
     useEffect(() => {
         const fetchRestaurantLocation = async () => {
             try {
@@ -58,6 +57,32 @@ const ReservationDetailScreen = ({ route, navigation }) => {
         fetchRestaurantLocation();
         fetchCurrentLocation();
     }, [reservation.restaurant_id._id]);
+    
+    const cancelReservation = async()=>{
+        Alert.alert(
+            "คุณต้องการยกเลิกการจองหรือไม่",
+            "หากยกเลิกการจองไปแล้วคุณจะไม่สามารถ ทำอะไรกับการจองนี้ได้อีก",
+            [
+                {
+                    text: "ยกเลิก",
+                    style: "cancel",
+                },
+                {
+                    text: "ยืนยัน",
+                    onPress: async () => {
+                        try {
+                            const response = await axios.put(apiheader + '/reservation/cancelReservation/' + reservationID);
+                            const result = await response.data;
+                            navigation.goBack();
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+    };
 
     const locationOn = async () => {
         Alert.alert(
@@ -243,6 +268,13 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                     </TouchableOpacity>
                 </View>
             )}
+            {reservation.status === "รอการยืนยัน" && (
+                <View style={styles.layuotButton2}>
+                    <TouchableOpacity style={styles.buttonGotores2} onPress={cancelReservation}>
+                        <Text style={styles.buttonGotoresText2}>ยกเลิกการจอง</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             <Modal
                            animationType="fade"
                            transparent={true}
@@ -407,6 +439,22 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     buttonGotoresText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    layuotButton2: {
+        alignSelf: 'flex-end',
+        borderRadius: 10,
+        padding: 10,
+        
+    },
+    buttonGotores2: {
+        backgroundColor: 'red',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 10,
+    },
+    buttonGotoresText2: {
         color: 'white',
         fontWeight: 'bold',
     },

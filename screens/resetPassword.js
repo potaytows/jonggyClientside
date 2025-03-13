@@ -51,10 +51,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2F2F2F',
+    
   },
   textTop: {
-    color: 'white',
+    
   },
   input: {
     borderWidth: 1,

@@ -8,7 +8,6 @@ import * as SecureStore from 'expo-secure-store';
 
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
-
 const HomeScreen = ({ navigation }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -255,7 +254,6 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white'
   },
   header: {
     width: '100%',
@@ -342,14 +340,7 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
     backgroundColor: 'white',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-
-    elevation: 5,
+    
   },
   text: {
     padding: 10,

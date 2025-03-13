@@ -210,19 +210,18 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 
             </View>
           </View>
-          <View style={styles.dragablecontainer}>
-            {obj.tables.map((item, index) => (
-              <StaticTable item={item} key={index} selected={selected} setSelected={setSelected}/>
-            ))}
-          </View>
-          <View style={styles.requestContainer} >
-            <Text style={styles.help}>ความต้องการเพิ่มเติม</Text>
-            <TextInput
-              style={styles.input}
-              value={request}
-              onChangeText={text => setRequest(text)}
-            />
-          </View>
+          {obj.tables  != undefined ? (
+              <View style={styles.dragablecontainer}>
+
+                {obj.tables.map((item, index) => (
+                  <StaticTable item={item} key={index} selected={selected} setSelected={setSelected} />
+                ))}
+              </View>
+
+            ) : (
+              <View></View>
+            )}
+          
         </View>
       </ScrollView>
       <View style={styles.viewshow} >
@@ -259,14 +258,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingTop: 20,
     paddingBottom: 10,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-
-    elevation: 5,
+   
   },
   requestContainer: {
     marginLeft: 20,
@@ -275,7 +267,7 @@ const styles = StyleSheet.create({
   laoutlogoRes: {
     width: 80,
     height: 100,
-    marginLeft: 20
+    marginLeft: 35
   },
   logoRes: {
     width: '100%',
@@ -319,10 +311,10 @@ const styles = StyleSheet.create({
     width: 380,
     height: 450,
     alignSelf: 'center',
-    marginTop: 40,
+    marginTop: 15,
     borderWidth: 2,
     borderRadius: 5,
-    marginBottom: 20,
+    marginBottom: 75,
     backgroundColor: 'white',
     borderColor: '#CCCCCC',
     overflow: 'hidden'
@@ -352,17 +344,18 @@ const styles = StyleSheet.create({
   },
   showtable: {
     marginTop: 15,
-    marginLeft: 10
+    marginLeft: 35
   },
   image: {
     height: 30,
-    width: 30
+    width: 30,
+    
   },
   layoutGuid: {
     flex: 1,
     alignSelf: 'flex-end',
     marginLeft: 10,
-    marginRight: 10
+    marginRight: 35
   },
   flexGuid: {
     marginTop: 15,

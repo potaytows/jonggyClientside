@@ -6,12 +6,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { reduce } from 'lodash';
 import Text from '../component/Text';
-
+import { Notifications } from 'react-native-notifications';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const socket = io(apiheader);
 
-const ChatScreen = ({ route }) => {
+const ChatScreen = ({ route ,navigation}) => {
     const { reservationID } = route.params;
     const [newMessage, setNewMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -20,12 +20,22 @@ const ChatScreen = ({ route }) => {
     const scrollViewRef = useRef();
 
     useEffect(() => {
+        // กำหนดให้รับการแจ้งเตือน
+        Notifications.events().registerNotificationOpened((notification, completion) => {
+            const chatReservationID = notification.payload.reservationID;
+            if (chatReservationID) {
+                navigation.navigate('ChatScreen', { reservationID: chatReservationID });
+            }
+            completion();
+        });
+    }, []);
+
+    useEffect(() => {
         const fetchChatMessages = async () => {
             try {
                 const response = await axios.get(apiheader + '/chat/newChat/' + reservationID);
                 setMessages(response.data.obj.messages || []);
                 setRestaurant(response.data.obj.restaurant || null);
-                console.log(messages)
             } catch (error) {
                 console.error(error);
             }
@@ -38,21 +48,18 @@ const ChatScreen = ({ route }) => {
     useFocusEffect(
         React.useCallback(() => {
             const userType = "customer";
-            console.log('Joining room:', reservationID);
             socket.emit('joinRoom', reservationID, userType);
 
             socket.on('message', (message) => {
-                console.log('Received message:', message);
                 setMessages(prevMessages => [...prevMessages, message]);
             });
+         
 
             socket.on('updateMessages', (updatedMessages) => {
-                console.log('Received updated messages:', updatedMessages);
                 setMessages(updatedMessages);
             });
 
             return () => {
-                console.log('Leaving room:', reservationID);
                 socket.emit('leaveRoom', reservationID);
                 socket.off('message');
                 socket.off('updateMessages');

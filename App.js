@@ -31,6 +31,8 @@ import { useFonts } from 'expo-font';
 import CouponScreen from './screens/coupon';
 import HelpCenterScreen from './screens/helpCenter';
 import SupportFormScreen from './screens/supportForm';
+import MySupportScreen from './screens/mySupport';
+
 
 const Stack = createStackNavigator();
 
@@ -121,6 +123,8 @@ const App = () => {
           <Stack.Screen name='coupon' component={CouponScreen} options={{ title: 'รายการจอง' }} />
           <Stack.Screen name='helpCenter' component={HelpCenterScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
           <Stack.Screen name='supportForm' component={SupportFormScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
+          <Stack.Screen name='mySupport' component={MySupportScreen} options={{ title: 'การรายงานของคุณ' }} />
+
 
 
         </Stack.Navigator>

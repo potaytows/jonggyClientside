@@ -131,7 +131,7 @@ const MenuList = ({ route, navigation }) => {
                     style={styles.confirmButton}
                     onPress={() => navigation.navigate('reserve', { restaurantId: route.params.restaurantId })}
                 >
-                    <Text style={styles.confirmButtonText}>ดูรากาารอาหาร</Text>
+                    <Text style={styles.confirmButtonText}>ดูรายการอาหาร</Text>
                 </TouchableOpacity>
                 </View>
                
@@ -167,8 +167,9 @@ const MenuList = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginLeft: 30,
-        marginRight: 30
+        marginLeft: 15,
+        marginRight: 15,
+        marginTop:15
 
 
     },
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     cardspace: {
-        padding: 15,
+        padding: 10,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,

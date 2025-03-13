@@ -9,6 +9,8 @@ const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
 const SupportFormScreen = ({ route , navigation}) => {
     const reservation = route.params.reservation;
+
+    const restaurant_id = reservation.restaurant_id;
     const user = route.params.user
     const [email, setEmail] = useState('');
     const [details, setDetails] = useState('');
@@ -48,8 +50,9 @@ const SupportFormScreen = ({ route , navigation}) => {
                 return;
             }
             const response = await axios.post(apiheader + '/helpCenter/supportForm', {
-                reservationId: reservation[0]._id,
+                reservationId: reservation._id,
                 username: user.username,
+                restaurant_id:restaurant_id,
                 email,
                 topic,
                 details,
@@ -67,7 +70,9 @@ const SupportFormScreen = ({ route , navigation}) => {
     };
     useEffect(() => {
         if (user.email) {
-            setEmail(user.email); // กำหนดค่าเริ่มต้นให้ state email จาก user.email
+            setEmail(user.email);
+    console.log(route.params.reservation._id)
+    // กำหนดค่าเริ่มต้นให้ state email จาก user.email
         }
     }, [user.email]);
     return (
@@ -77,10 +82,10 @@ const SupportFormScreen = ({ route , navigation}) => {
             <View style={styles.reportItem}>
                 <Image style={styles.reportImage} source={require('../assets/images/cutlery.png')} />
                 <View style={styles.reportDetails}>
-                    <Text style={styles.reportTitle}>{reservation[0].restaurant_id.restaurantName}</Text>
-                    <Text style={styles.reportDate}>{formatDate(reservation[0].createdAt)}</Text>
+                    <Text style={styles.reportTitle}>{reservation.restaurantName}</Text>
+                    <Text style={styles.reportDate}>{formatDate(reservation.createdAt)}</Text>
                 </View>
-                <Text style={styles.reportPrice}>{reservation[0].total}</Text>
+                <Text style={styles.reportPrice}>{reservation.total}</Text>
             </View>
 
             {/* ส่วนแบบฟอร์ม */}

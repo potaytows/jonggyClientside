@@ -226,8 +226,6 @@ const ReservationScreen = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
 
-                <Text style={styles.rq}>ความต้องการเพิ่มเติม</Text>
-
                 {cartItems[0] === undefined ? (
                     <Text style={styles.selectedTables}>-</Text>
                 ) : (

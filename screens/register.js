@@ -77,9 +77,14 @@ const RegisterScreen = ({ navigation }) => {
       const result = await response.json();
       console.log(result);
 
-      navigation.navigate('Login');
-      Alert.alert('', 'สมัครเสร็จสิ้น', [{ text: 'OK', onPress: () => { } }]);
-
+      if (result.error) { 
+        // ถ้ามี error จาก API ให้แจ้งเตือน
+        Alert.alert('', result.error, [{ text: 'OK' }]);
+      } else {
+        console.log(result);
+        Alert.alert('', 'สมัครเสร็จสิ้น', [{ text: 'OK' }]);
+        navigation.navigate('Login');
+      }
     } catch (error) {
       console.error(error);
     }
@@ -147,6 +152,7 @@ const RegisterScreen = ({ navigation }) => {
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
           locale="th"
+          maximumDate={new Date()}
         />
         <Text style={styles.inputs}>อีเมล์</Text>
         <TextInput
@@ -183,7 +189,6 @@ const styles = StyleSheet.create({
     color: '#FF914D',
     marginBottom: 5,
 
-
   },
   passwordInputContainer: {
     flexDirection: 'row',
@@ -196,10 +201,11 @@ const styles = StyleSheet.create({
   inputWithIcon: {
     flex: 1,
     borderWidth: 1,
-    color: 'white',
-    borderColor: '#FF914D',
+    borderColor: '#FB992C',
     borderRadius: 5,
     padding: 10,
+    backgroundColor:'white'
+
   },
   iconContainer: {
     padding: 10,
@@ -209,7 +215,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#2F2F2F',
+    backgroundColor: '#F8F0D9',
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -221,18 +227,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color: '#F66060'
+    color: '#FB992C'
 
   },
   input: {
     borderWidth: 1,
-    color: 'white',
     borderColor: '#FF914D',
     borderRadius: 5,
     width: '80%',
     padding: 10,
     marginBottom: 10,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    backgroundColor:'white'
 
 
   },

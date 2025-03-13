@@ -78,7 +78,7 @@ const ProfileScreen = ({ navigation }) => {
 
             <View style={styles.flexpro_img}>
               <TouchableOpacity>
-                <View style={styles.profileImage}><Text></Text></View>
+                <Image style={styles.profileImage} source={require('../assets/images/profileUser.png')} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.ChangeUser} onPress={handleEditProfile}>
                 <Text style={styles.Name}>{userInfo?.username}</Text>
@@ -189,10 +189,8 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 75,
     height: 75,
-    backgroundColor: 'gray',
     borderRadius: 50,
-    borderWidth: 3,
-    borderColor: 'black'
+  
   },
   textbutton: {
     fontSize: 18,
