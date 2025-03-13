@@ -71,7 +71,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     if (!isLoggedIn) {
       navigation.navigate('profile');
     } else {
-      navigation.navigate('reserve', {
+      navigation.navigate('selectReserveTime', {
         restaurantId: route.params.restaurantId,
         restaurantName: restaurantDetails.restaurantName,
         selectedTables: selected,
@@ -120,72 +120,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     );
   }
 
-  const TableComponent = (props) => {
-    const item = props.item
-    if (item.type == "text") {
-      return (
-        <View style={[styles.container]}>
-          <Text style={styles.text}>{item.text}</Text>
-        </View>
-      );
-
-    }
-    // ? backgroundColor:item.color:{}
-    if (item.type == "shape") {
-      return (
-        <View style={[styles.container, { left: item.x, top: item.y }]}>
-          <View style={[styles.shape, { height: item.height, width: item.width, backgroundColor: item.color }]}>
-          </View>
-
-        </View>
-      );
-
-    }
-    if (item.type == "table") {
-      if (contains(selected, item)) {
-        return (
-          <View style={styles.dragablecontent}>
-
-            <TouchableOpacity onPress={() => removeSelected(item)} style={styles.dragable}>
-              <View style={{ left: item.x, top: item.y }}>
-                <View style={[styles.tablecontainer]}>
-                  <Image
-                    style={styles.image}
-                    source={require('../assets/images/table.png')}
-                    tintColor={"gray"}
-
-                  />
-
-                  <Text style={styles.text}>{item.text}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )
-      } else {
-        return (
-          <View style={styles.dragablecontent}>
-
-            <TouchableOpacity onPress={() => addSelected(item)}>
-              <View style={{ left: item.x, top: item.y }}>
-                <View style={[styles.tablecontainer]}>
-                  <Image
-                    source={require('../assets/images/table.png')}
-                    style={styles.image}
-                  />
-                  <Text style={styles.text}>{item.text}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )
-      }
-
-
-    }
-
-  }
-
   return (
     <View>
       <ScrollView>
@@ -212,7 +146,6 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           </View>
           {obj.tables  != undefined ? (
               <View style={styles.dragablecontainer}>
-
                 {obj.tables.map((item, index) => (
                   <StaticTable item={item} key={index} selected={selected} setSelected={setSelected} />
                 ))}
@@ -234,7 +167,9 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           ))}
         </Text>
 
-        <TouchableOpacity style={styles.reserveButton} onPress={handlecomplete} >
+        <TouchableOpacity style={[styles.reserveButton ,selected.length === 0 && { backgroundColor: 'gray' },]} onPress={handlecomplete}
+          disabled={selected.length === 0}
+        >
           <Text style={styles.reserveButtonText}>ยืนยันการเลือกโต๊ะ</Text>
         </TouchableOpacity>
       </View>
@@ -250,7 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch',
     position: 'relative',
-    paddingBottom: 50
+    paddingBottom: 50,
   },
   restaurantContainer: {
     flexDirection: 'row',
@@ -258,7 +193,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingTop: 20,
     paddingBottom: 10,
-   
   },
   requestContainer: {
     marginLeft: 20,
@@ -364,7 +298,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     alignItems: 'center',
     padding: 10,
-    borderRadius: 10
+    borderRadius: 5
 
   },
   statusGuid: {

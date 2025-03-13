@@ -16,6 +16,8 @@ const MenuChooseTableScreen = ({ route, navigation }) => {
             restaurant: route.params.restaurant,
             selectedTables: [selectedTable],
             navigationSource: route.params.navigationSource,
+            startTime:route.params.startTime,
+            endTime:route.params.endTime
         });
         console.log([selectedTable]);
     };
