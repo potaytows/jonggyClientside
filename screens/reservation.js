@@ -9,7 +9,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Text from '../component/Text';
 import * as ImagePicker from 'expo-image-picker';
-
+import moment from 'moment-timezone';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const socket = io(apiheader);
@@ -84,6 +84,8 @@ const ReservationScreen = ({ navigation, route }) => {
             restaurantId: route.params.restaurantId,
             restaurant: restaurantDetails,
             selectedTables: selectedTables,
+            startTime:route.params.startTime,
+            endTime:route.params.endTime
         });
     };
     const handlePromotion = () => {
@@ -130,18 +132,14 @@ const ReservationScreen = ({ navigation, route }) => {
             console.error(error);
         }
     };
-
-
-
-
     const fetchReserveTables = async () => {
-        if (isProcessing) return; // ป้องกันการกดซ้ำ
+        if (isProcessing) return; 
         setIsProcessing(true);
         try {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username
             const totalP = totalPrice;
-            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id, total: totalP }
+            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id, total: totalP,startTime:route.params.startTime,endTime:route.params.endTime, }
             const response = await axios.post(apiheader + '/reservation/reserveTables/', obj);
             const result = await response.data;
             if (result.status == "reserved successfully") {
@@ -192,6 +190,7 @@ const ReservationScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         fetchRestaurantDetails();
+        console.log(route.params)
         setSelectedTables(route.params.selectedTables || []);
     }, []);
 
@@ -220,6 +219,9 @@ const ReservationScreen = ({ navigation, route }) => {
                                 )
                             ))}
                         </Text>
+                        <Text style={styles.selectedTables}>
+                            {moment(route.params.startTime).format('HH:mm')} - {moment(route.params.endTime).format('HH:mm')}
+                        </Text>
                     </View>
                     <TouchableOpacity style={styles.button} onPress={handleGetMenu}>
                         <Text style={styles.buttonText}>สั่งอาหารล่วงหน้า</Text>
@@ -243,7 +245,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                             {index === 0 && (
                                                 <View style={styles.listContainer}>
                                                     <Text style={styles.tableTitle}> {item.selectedTables.length > 1 ?
-                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.tableName}</Text>)}
+                                                        <Text>โต๊ะรวม</Text> : item.selectedTables.map((table, index) => <Text key={index}>โต๊ะ {table.text}</Text>)}
                                                     </Text>
                                                     <View style={styles.MenuTitle}>
 
@@ -377,7 +379,7 @@ const ReservationScreen = ({ navigation, route }) => {
                     {isProcessing ? 'กำลังดำเนินการ...' : 'ยืนยันการจอง'}
                 </Text>
             </TouchableOpacity>
-          
+
         </View>
 
     );
@@ -620,34 +622,34 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 10
     },
-    layoutModal:{
-        width:300,
-        height:320,
+    layoutModal: {
+        width: 300,
+        height: 320,
         position: "absolute",
         top: '50%',
         left: '50%',
         transform: "translate(-50%, -50%)"
     },
-    iconModal:{
-        width:300,
-        height:300,
+    iconModal: {
+        width: 300,
+        height: 300,
         position: "absolute",
         top: '30%',
         left: '50%',
         transform: "translate(-50%, -50%)"
     },
-    successText:{
+    successText: {
         fontSize: 25,
         fontWeight: 'bold',
         marginBottom: 10,
-        textAlign:'center',
+        textAlign: 'center',
         position: "absolute",
         bottom: 0,
         left: '50%',
         transform: "translate(-50%, -50%)"
     }
-    
-    
+
+
 });
 
 export default ReservationScreen;

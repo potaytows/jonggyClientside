@@ -40,16 +40,17 @@ const LoginScreen = ({ navigation }) => {
                 setTimeout(() => {
                     navigation.navigate('tab');
                 }, 200);
-            } if (response.data.status == "banned") {
+            }else {
+                setUsernameNotFound(true);
+                setPasswordNotFound(true);
+            }
+            if (response.data.status == "banned") {
                 Alert.alert('บัญชีของคุณถูกระงับการใช้งาน', 'บัญชีของคุณได้ถูกระงับการใช้งานชั่วคราว กรุณาติดต่ออีเมลล์ takachi.y@kkumail.com', [
                     {
                         text: 'ตกลง',
                     },
                 ]);
-            } else {
-                setUsernameNotFound(true);
-                setPasswordNotFound(true);
-            }
+            } 
         } catch (error) {
             console.log(error);
             setUsernameNotFound(true);

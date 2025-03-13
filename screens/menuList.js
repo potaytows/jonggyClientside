@@ -152,6 +152,8 @@ const MenuList = ({ route, navigation }) => {
                                     navigationSource: route.params.navigationSource,
                                     selectedMenuItem: selectedMenuItem,
                                     selectedTables: selectedTables,
+                                    startTime:route.params.startTime,
+                                    endTime:route.params.endTime
                                 }
                             }}
                             closeModal={() => handleclose()}

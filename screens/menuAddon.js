@@ -55,7 +55,7 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
         const username = login.username
         const cartData = {
             restaurantId: route.params.restaurantId,
-            selectedTables: selectedTables.map(table => ({ _id: table._id, tableName: table.tableName })),
+            selectedTables: selectedTables.map(table => ({ _id: table._id, text: table.text })),
             selectedMenuItem: {
                 _id: selectedMenuItem._id,
                 menuName: selectedMenuItem.menuName,
@@ -64,7 +64,9 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
             selectedAddons: selectedAddons.map(addon => ({ _id: addon._id, AddOnName: addon.AddOnName, price: addon.price* quantity })),
             OrderTableType: route.params.navigationSource,
             username: username,
-            Count: quantity 
+            Count: quantity ,
+            startTime:route.params.startTime,
+            endTime:route.params.endTime
         };
 
 
@@ -77,11 +79,14 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
         } catch (error) {
             console.error('Error adding cart data: ', error);
         }
+        console.log(route.params.startTime)
         navigation.navigate('reserve',
             {
                 restaurantId: route.params.restaurantId,
                 navigationSource: route.params.navigationSource,
                 selectedTables: selectedTables,
+                startTime:route.params.startTime,
+                endTime:route.params.endTime
             });
     };
 
