@@ -33,6 +33,8 @@ import SelectTimeScreen from './screens/selectTime';
 import CouponScreen from './screens/coupon';
 import HelpCenterScreen from './screens/helpCenter';
 import SupportFormScreen from './screens/supportForm';
+import MySupportScreen from './screens/mySupport';
+
 import ReserveTime from './screens/selectReserveTime';
 
 const Stack = createStackNavigator();
@@ -102,8 +104,7 @@ const App = () => {
                 />
               ),
               headerBackTitleVisible: false,
-            }}
-          >
+            }}>
             <Stack.Screen name="tab" component={Tabs} options={{ headerShown: false }} />
             <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
@@ -121,11 +122,7 @@ const App = () => {
             <Stack.Screen name="reservationList" component={ReservationListScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="reservationDetail" component={ReservationDetailScreen} options={{ title: 'รายการจองของคุณ' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen
-              name="RestaurantDetail"
-              component={RestaurantDetailScreen}
-              options={({ route }) => ({ title: route.params.restaurantName })}
-            />
+            <Stack.Screenname="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
             <Stack.Screen name="selecttime" component={SelectTimeScreen} />
             <Stack.Screen name="coupon" component={CouponScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="helpCenter" component={HelpCenterScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />

@@ -68,7 +68,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.container2} >
                 <TextInput
                     placeholder='ชื่อผู้ใช้'
-                    placeholderTextColor='gray'
+                    placeholderTextColor='#FA9223'
                     style={[styles.input, usernameNotFound && styles.inputError]}
                     value={username}
                     onChangeText={(text) => {
@@ -78,7 +78,7 @@ const LoginScreen = ({ navigation }) => {
                 />
                 <TextInput
                     placeholder='รหัสผ่าน'
-                    placeholderTextColor='gray'
+                    placeholderTextColor='#FA9223'
                     style={[styles.input, passwordNotFound && styles.inputError]}
                     value={password}
                     onChangeText={(text) => {
@@ -110,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#2F2F2F',
+        backgroundColor: '#F8F0D9',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -119,9 +119,8 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        color: 'white',
-        backgroundColor: '#FF313180',
-        borderColor: '#FF3131',
+        backgroundColor: '#FFFFFF',
+        borderColor: '#FB992C',
         borderRadius: 5,
         width: '80%',
         padding: 10,
@@ -147,7 +146,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     textbutton: {
-        color: '#FF3131',
+        color: '#FF914D',
         fontSize: 16,
         textDecorationLine: 'underline',
     },

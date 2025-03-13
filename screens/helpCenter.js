@@ -49,7 +49,10 @@ const HelpCenterScreen = ({navigation, route}) => {
 
 
     const handleSupport = (reservation) => {
-        navigation.navigate('supportForm', {user : userInfo, reservation: reservationList});
+        navigation.navigate('supportForm', {user : userInfo, reservation: reservation});
+      };
+      const handlemySupport = (reservation) => {
+        navigation.navigate('mySupport', {user : userInfo, reservation: reservation});
       };
     return (
 
@@ -72,19 +75,19 @@ const HelpCenterScreen = ({navigation, route}) => {
                     </View>
 
                     <ScrollView>
-                        <TouchableOpacity style={styles.menuItem}>
+                        <TouchableOpacity style={styles.menuItem} onPress={()=>{handlemySupport()}}>
                             <Text style={styles.menuTitle}>เรื่องที่คุณรายงาน</Text>
-                            <Text style={styles.menuSubtitle}>ตรวจสอบประวัติการรายงานที่ผ่านมามา</Text>
+                            <Text style={styles.menuSubtitle}>ตรวจสอบประวัติการรายงานที่ผ่านมา</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.menuItem}>
-                            <Text style={styles.menuTitle}>คำถามที่พบบ่อยและบทความที่เกี่ยวข้อง</Text>
+                            <Text style={styles.menuTitle}>คำถามที่พบบ่อย</Text>
                             <Text style={styles.menuSubtitle}>ค้นหาเพิ่มเติมเกี่ยวกับบริการของเรา</Text>
                         </TouchableOpacity>
 
                         <Text style={styles.sectionTitle}>รายการล่าสุด</Text>
                         {reservationList.map((report,index) => (
-                            <TouchableOpacity key={report._id} style={styles.reportItem} onPress={handleSupport}>
+                            <TouchableOpacity key={report._id} style={styles.reportItem} onPress={()=>{handleSupport(report)}}>
                                 <Image style={styles.reportImage} source={require('../assets/images/cutlery.png')} />
                                 <View style={styles.reportDetails}>
                                     <Text style={styles.reportTitle}>{report.restaurant_id.restaurantName}</Text>
