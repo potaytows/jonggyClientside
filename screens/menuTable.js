@@ -19,8 +19,9 @@ const MenuTableScreen = ({route, navigation  }) => {
             restaurant: route.params.restaurant,
             selectedTables: selectedTables,
             navigationSource: 'OrderTogether',
+            startTime:route.params.startTime,
+            endTime:route.params.endTime
         });
-        console.log(selectedTables)
       };
       const handleChooseTable = () => {
         navigation.navigate('chooseTable', {
@@ -28,6 +29,8 @@ const MenuTableScreen = ({route, navigation  }) => {
             restaurant: route.params.restaurant,
             selectedTables: selectedTables,
             navigationSource: 'SingleTable',
+            startTime:route.params.startTime,
+            endTime:route.params.endTime
             
 
         });

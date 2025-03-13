@@ -1,17 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import axios from 'axios';  
-import { useFonts } from 'expo-font';
+import { Text } from 'react-native';
 
-const TextComponent =  props => {
-    const style = props.style !=undefined ? props.style : {}
+const TextComponent = (props) => {
+    const { style, children } = props;
+    
+    // Convert style array to a single object
+    const customStyle = Array.isArray(style) ? Object.assign({}, ...style) : { ...style };
 
-    return (
-        <Text {...props} style={[style,{fontFamily:'Kanit-Regular',}]}>{props.children}</Text>
-    );
+    // Determine the correct font
+    const fontFamily =
+        customStyle.fontWeight === 'bold' || customStyle.fontWeight === '700'
+            ? 'Kanit-Bold'
+            : 'Kanit-Regular';
+
+    // Remove fontWeight to prevent conflicts
+    delete customStyle.fontWeight;
+
+    return <Text {...props} style={[customStyle, { fontFamily }]}>{children}</Text>;
 };
-
-
 
 export default TextComponent;
