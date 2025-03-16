@@ -53,10 +53,8 @@ const ReservationScreen = ({ navigation, route }) => {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
 
-            // ส่งข้อมูลไปที่ Socket
             socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username });
 
-            // ฟังผลลัพธ์สำเร็จ
             socket.on('uploadSlipSuccess', (response) => {
                 setUploading(false);
                 setUploadResult(`${response.message}`);
@@ -67,7 +65,6 @@ const ReservationScreen = ({ navigation, route }) => {
                 }, 5000);
             });
 
-            // ฟังผลลัพธ์ข้อผิดพลาด
             socket.on('uploadSlipError', (error) => {
                 setUploading(false);
                 setError(`${error.message}`);
@@ -84,8 +81,8 @@ const ReservationScreen = ({ navigation, route }) => {
             restaurantId: route.params.restaurantId,
             restaurant: restaurantDetails,
             selectedTables: selectedTables,
-            startTime:route.params.startTime,
-            endTime:route.params.endTime
+            startTime: route.params.startTime,
+            endTime: route.params.endTime
         });
     };
     const handlePromotion = () => {
@@ -111,21 +108,49 @@ const ReservationScreen = ({ navigation, route }) => {
     const fetchCart = async () => {
         try {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
-            const username = login.username
-            const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);
-            const result = await response.data;
+            const username = login.username;
+            const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);  // Modify to get all carts for the user in the restaurant
+            const carts = await response.data;
 
-            if (result) {
+            if (carts && carts.length > 0) {
+                // Collect current tables from the screen
+                const currentTables = route.params.selectedTables.map((table) => table._id);
 
-                setCartItems(result)
+                // Loop through each cart and check if any selected table is missing
+                const cartsToDelete = [];
+                const validCarts = [];
+
+                carts.forEach(cart => {
+                    const cartTables = cart.selectedTables.map((table) => table._id);
+                    const missingTables = cartTables.filter((tableId) => !currentTables.includes(tableId));
+
+                    // If there are missing tables in the cart, add to delete list
+                    if (missingTables.length > 0) {
+                        cartsToDelete.push(cart._id);  // Collect the cart ID for deletion
+                    } else {
+                        validCarts.push(cart);  // Add valid cart to the list
+                    }
+                });
+
+                if (cartsToDelete.length > 0) {
+                    // Delete multiple carts
+                    await Promise.all(
+                        cartsToDelete.map(cartId => axios.delete(apiheader + '/cart/deleteCartById/' + cartId))
+                    );
+                    console.log('Carts deleted because some tables no longer exist.');
+                }
+
+                // Update state with only valid carts
+                setCartItems(validCarts);
             }
         } catch (error) {
             console.error(error);
         }
     };
+
     const fetchDeleteCart = async (id) => {
         try {
-            const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
+            const response = await axios.delete(apiheader + '/cart/deleteCartById/' + id);
             const result = await response.data;
 
         } catch (error) {
@@ -133,13 +158,13 @@ const ReservationScreen = ({ navigation, route }) => {
         }
     };
     const fetchReserveTables = async () => {
-        if (isProcessing) return; 
+        if (isProcessing) return;
         setIsProcessing(true);
         try {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username
             const totalP = totalPrice;
-            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id, total: totalP,startTime:route.params.startTime,endTime:route.params.endTime, }
+            const obj = { reservedTables: selectedTables, username: username, restaurant_id: restaurantDetails._id, total: totalP, startTime: route.params.startTime, endTime: route.params.endTime, }
             const response = await axios.post(apiheader + '/reservation/reserveTables/', obj);
             const result = await response.data;
             if (result.status == "reserved successfully") {
@@ -206,7 +231,9 @@ const ReservationScreen = ({ navigation, route }) => {
         <View style={styles.container}>
             <ScrollView>
                 <View style={styles.restaurantContainer}>
-                    <Image style={styles.logoRes} source={{ uri: apiheader + '/image/getRestaurantIcon/' + restaurantDetails._id }} />
+                    <View style={styles.layoutlogoRes}>
+                        <Image style={styles.logoRes} source={{ uri: `${apiheader}/image/getRestaurantIcon/${restaurantDetails._id}?timestamp=${new Date().getTime()}` }} />
+                    </View>
                     <View style={styles.restaurantContainer2}>
                         <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
                         <Text style={styles.selectedTables}>โต๊ะที่เลือก:</Text>
@@ -404,12 +431,16 @@ const styles = StyleSheet.create({
         marginBottom: 15
 
     },
-    logoRes: {
+    layoutlogoRes: {
         width: 80,
-        height: 120,
+        height: 100,
+        marginTop: 15
+    },
+    logoRes: {
+        width: '100%',
+        height: 110,
         resizeMode: 'cover',
         borderRadius: 5,
-        marginLeft: 10
     },
     restaurantName: {
         marginLeft: 20,
@@ -435,7 +466,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         textAlign: 'center',
-        fontWeight: 'bold'
     },
     buttonReserve: {
         position: 'absolute',

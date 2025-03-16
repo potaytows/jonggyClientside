@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
     textChooseTable: {
         color: 'white',
         textAlign: 'center',
-        fontWeight: 'bold'
     },
 });
 

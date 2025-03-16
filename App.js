@@ -122,7 +122,7 @@ const App = () => {
             <Stack.Screen name="reservationList" component={ReservationListScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="reservationDetail" component={ReservationDetailScreen} options={{ title: 'รายการจองของคุณ' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screenname="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
+            <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
             <Stack.Screen name="selecttime" component={SelectTimeScreen} />
             <Stack.Screen name="coupon" component={CouponScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="helpCenter" component={HelpCenterScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
