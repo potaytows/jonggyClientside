@@ -93,14 +93,17 @@ const App = () => {
             screenOptions={{
               headerBackground: () => <CustomHeaderBackground />,
               headerTintColor: 'white',
-              headerTitleAlign: 'center',
-              headerTitleStyle: { fontSize: 25, paddingTop: 12, fontFamily: 'Kanit-Regular' },
+              headerTitleAlign: 'left',
+              headerStatusBarHeight:55,
+              headerTitleStyle: { fontSize: 25, fontFamily: 'Kanit-Regular', },
               headerBackImage: () => (
                 <Ionicons
                   name="chevron-back"
                   size={40}
                   color="white"
-                  style={{ paddingTop: 10 }}
+                  style={{
+                    
+                  }}
                 />
               ),
               headerBackTitleVisible: false,
@@ -122,12 +125,14 @@ const App = () => {
             <Stack.Screen name="reservationList" component={ReservationListScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="reservationDetail" component={ReservationDetailScreen} options={{ title: 'รายการจองของคุณ' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screenname="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
+            <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
             <Stack.Screen name="selecttime" component={SelectTimeScreen} />
             <Stack.Screen name="coupon" component={CouponScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="helpCenter" component={HelpCenterScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
             <Stack.Screen name="supportForm" component={SupportFormScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
             <Stack.Screen name="selectReserveTime" component={ReserveTime} options={{ title: 'เลือกเวลาจอง' }} />
+            <Stack.Screen name="mySupport" component={MySupportScreen} options={{ title: 'เลือกเวลาจอง' }} />
+
           </Stack.Navigator>
           <FlashMessage position="top" />
         </NotificationProvider>
