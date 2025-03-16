@@ -6,7 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { reduce } from 'lodash';
 import Text from '../component/Text';
-import { Notifications } from 'react-native-notifications';
+
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const socket = io(apiheader);
@@ -19,16 +19,7 @@ const ChatScreen = ({ route ,navigation}) => {
     const [restaurant, setRestaurant] = useState(null);
     const scrollViewRef = useRef();
 
-    useEffect(() => {
-        // กำหนดให้รับการแจ้งเตือน
-        Notifications.events().registerNotificationOpened((notification, completion) => {
-            const chatReservationID = notification.payload.reservationID;
-            if (chatReservationID) {
-                navigation.navigate('ChatScreen', { reservationID: chatReservationID });
-            }
-            completion();
-        });
-    }, []);
+    
 
     useEffect(() => {
         const fetchChatMessages = async () => {

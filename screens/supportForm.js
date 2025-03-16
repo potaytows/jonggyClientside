@@ -56,6 +56,7 @@ const SupportFormScreen = ({ route , navigation}) => {
                 email,
                 topic,
                 details,
+                whosend:'user'
             });
             showMessage({
                 message: 'ส่งแบบฟอร์มสำเร็จ',
