@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid,Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image'
@@ -9,7 +9,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Text from '../component/Text';
 import StaticTable from '../component/staticTable';
+import { Dimensions } from 'react-native';
 
+const screenWidth = Dimensions.get('window').width;
 function Menucontains(arr, key, val) {
 
   for (var i = 0; i < arr.length; i++) {
@@ -67,17 +69,42 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     }
   };
 
-  const handlecomplete = async () => {
+  const handleComplete = async () => {
     if (!isLoggedIn) {
-      navigation.navigate('profile');
-    } else {
-      navigation.navigate('selectReserveTime', {
-        restaurantId: route.params.restaurantId,
-        restaurantName: restaurantDetails.restaurantName,
-        selectedTables: selected,
-      });
+        navigation.navigate('profile');
+        return;
     }
-  };
+
+    try {
+      const response = await axios.get(
+        `${apiheader}/reservation/getReservationsByUsername/${userInfo.username}`,
+        { params: { restaurantId: route.params.restaurantId } } 
+    );
+        const reservations = response.data;
+
+        if (reservations.length > 0) {
+          Alert.alert(
+            "คุณมีการจองอยู่แล้ว",  
+            "คุณมีการจองที่ร้านนี้อยู่แล้ว ต้องการดูรายการจองของคุณหรือไม่?",
+            [
+                { text: "ยกเลิก", style: "cancel" },
+                { 
+                    text: "ดูรายการจอง", 
+                    onPress: () => navigation.navigate('tab', { screen: 'reservationList' }) 
+                }
+            ]
+        );
+        } else {
+            navigation.navigate('selectReserveTime', {
+                restaurantId: route.params.restaurantId,
+                restaurantName: restaurantDetails.restaurantName,
+                selectedTables: selected,
+            });
+        }
+    } catch (error) {
+        console.error('Error checking reservation:', error);
+    }
+};
   function compareObjs(obj1, obj2) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
@@ -125,8 +152,8 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.restaurantContainer}>
-            <View style={styles.laoutlogoRes}>
-              <Image style={styles.logoRes} source={{ uri: apiheader + '/image/getRestaurantIcon/' + restaurantDetails._id }} />
+            <View style={styles.layoutlogoRes}>
+              <Image style={styles.logoRes}  source={{ uri: `${apiheader}/image/getRestaurantIcon/${restaurantDetails._id}?timestamp=${new Date().getTime()}` }}  />
             </View>
             <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
 
@@ -167,7 +194,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           ))}
         </Text>
 
-        <TouchableOpacity style={[styles.reserveButton ,selected.length === 0 && { backgroundColor: 'gray' },]} onPress={handlecomplete}
+        <TouchableOpacity style={[styles.reserveButton ,selected.length === 0 && { backgroundColor: 'gray' },]} onPress={handleComplete}
           disabled={selected.length === 0}
         >
           <Text style={styles.reserveButtonText}>ยืนยันการเลือกโต๊ะ</Text>
@@ -192,16 +219,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     backgroundColor: 'white',
     paddingTop: 20,
-    paddingBottom: 10,
+    paddingBottom: 20,
   },
   requestContainer: {
     marginLeft: 20,
 
   },
-  laoutlogoRes: {
+  layoutlogoRes: {
     width: 80,
     height: 100,
-    marginLeft: 35
+    marginLeft: 9
   },
   logoRes: {
     width: '100%',
@@ -242,7 +269,7 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   dragablecontainer: {
-    width: 380,
+    width: screenWidth * 0.96,
     height: 450,
     alignSelf: 'center',
     marginTop: 15,
@@ -278,7 +305,7 @@ const styles = StyleSheet.create({
   },
   showtable: {
     marginTop: 15,
-    marginLeft: 35
+    marginLeft: 10
   },
   image: {
     height: 30,
@@ -289,7 +316,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'flex-end',
     marginLeft: 10,
-    marginRight: 35
+    marginRight: 10
   },
   flexGuid: {
     marginTop: 15,
