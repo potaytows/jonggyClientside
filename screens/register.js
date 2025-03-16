@@ -175,7 +175,7 @@ const RegisterScreen = ({ navigation }) => {
           onPress={fetchaddUser}
           disabled={!isPhoneNumberValid}
         >
-          <Text style={styles.buttonText}>Register</Text>
+          <Text style={styles.buttonText}>ลงทะเบียน</Text>
         </TouchableOpacity>
       </View>
     </View>

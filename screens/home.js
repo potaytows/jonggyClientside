@@ -5,7 +5,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import Text from '../component/Text';
 import * as SecureStore from 'expo-secure-store';
+import { Dimensions } from 'react-native';
 
+const screenWidth = Dimensions.get('window').width;
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const HomeScreen = ({ navigation }) => {
@@ -43,7 +45,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       const response = await axios.get(apiheader + '/users/getusers/' + username)
       const result = await response.data;
-      if (result?.isBanned== true) {
+      if (result?.isBanned == true) {
         await SecureStore.deleteItemAsync('userCredentials');
         navigation.navigate('Login');
       }
@@ -109,7 +111,7 @@ const HomeScreen = ({ navigation }) => {
         )}
         {searchQuery === '' && (
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} ref={scrollRef}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} ref={scrollRef} style={{width:'100%'}}>
             <TouchableOpacity style={styles.promotioncard}>
               <Image style={styles.promotions} source={require('../assets/images/pmtss1.png')} />
             </TouchableOpacity>
@@ -140,7 +142,10 @@ const HomeScreen = ({ navigation }) => {
                     key={item._id}
                   >
                     <View style={styles.searchcard}>
-                      <Image style={styles.searchlogo} source={{ uri: apiheader + '/image/getRestaurantIcon/' + item._id }} />
+                      <Image
+                        style={styles.searchlogo}
+                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                      />
                       <View style={styles.searchtext}>
                         <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
                         <Text style={styles.restaurantDescription}>{item.description}</Text>
@@ -167,7 +172,10 @@ const HomeScreen = ({ navigation }) => {
                     key={item._id}
                   >
                     <View style={styles.card}>
-                      <Image style={styles.logo} source={{ uri: apiheader + '/image/getRestaurantIcon/' + item._id }} />
+                      <Image
+                        style={styles.logo}
+                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                      />
                       <View style={styles.text}>
                         <Text style={styles.restaurantName}>{item.restaurantName}</Text>
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
@@ -197,7 +205,10 @@ const HomeScreen = ({ navigation }) => {
                     key={item._id}
                   >
                     <View style={styles.card}>
-                      <Image style={styles.logo} source={{ uri: apiheader + '/image/getRestaurantIcon/' + item._id }} />
+                      <Image
+                        style={styles.logo}
+                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                      />
                       <View style={styles.text}>
                         <Text style={styles.restaurantName}>{item.restaurantName}</Text>
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
@@ -223,7 +234,10 @@ const HomeScreen = ({ navigation }) => {
                     key={item._id}
                   >
                     <View style={styles.searchcard}>
-                      <Image style={styles.searchlogo} source={{ uri: apiheader + '/image/getRestaurantIcon/' + item._id }} />
+                      <Image
+                        style={styles.searchlogo}
+                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                      />
                       <View style={styles.searchtext}>
                         <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
                         <Text style={styles.restaurantDescription}>{item.description}</Text>
@@ -287,7 +301,7 @@ const styles = StyleSheet.create({
 
   },
   underhResContainer: {
-    marginLeft: 30,
+    marginLeft: 15,
     marginRight: 30
   },
 
@@ -311,7 +325,7 @@ const styles = StyleSheet.create({
   searchtext: {
     flex: 1,
     marginLeft: '3%',
-    
+
   },
   searchrestaurantName: {
     fontSize: 16
@@ -337,10 +351,12 @@ const styles = StyleSheet.create({
   card: {
     width: 180,
     height: 230,
-    margin: 10,
+    marginTop: 10,
+    marginRight: 10,
+    marginBottom: 10,
+    marginLeft: 0, 
     borderRadius: 10,
     backgroundColor: 'white',
-    
   },
   text: {
     padding: 10,
@@ -354,7 +370,7 @@ const styles = StyleSheet.create({
   restaurantDescription: {
     fontSize: 14,
     color: 'gray',
-    
+
   },
   distant: {
     marginLeft: 'auto',
@@ -374,19 +390,17 @@ const styles = StyleSheet.create({
 
   },
   promotioncard: {
-    width: 400,
+    width: screenWidth * 0.9, 
     height: 200,
-    marginLeft: 20,
+    marginLeft: 15,
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   promotions: {
     width: '100%',
-    height: 200,
+    height: '100%', 
     resizeMode: 'cover',
     borderRadius: 10,
-
   },
   pmtsub: {
     alignSelf: 'flex-start',
