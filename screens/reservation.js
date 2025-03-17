@@ -314,72 +314,78 @@ const ReservationScreen = ({ navigation, route }) => {
                                     ))}
                                 </View>
                             </View>
-                            <View style={styles.total}>
-                                <Text style={styles.totalPrice}>ราคารวม ฿{totalPriceBeforeDiscount.toFixed(2)}</Text>
-
-                                {selectedCoupon && (
-                                    <View>
-                                        <View style={styles.flexDiscount}>
-                                            <Text style={styles.discountLabel1}>ส่วนลด ({selectedCoupon.name})</Text>
-                                            <Text style={styles.discountLabel2}> -฿{discount.toFixed(2)}</Text>
-                                        </View>
-                                        <Text style={styles.finalPriceLabel}>ราคาสุทธิ: ฿{totalPrice.toFixed(2)}</Text>
-                                    </View>
-
-                                )}
-                            </View>
-                            <View style={styles.Promotion}>
-                                <Text style={styles.TextPromotion1}>คูปอง</Text>
-                                <TouchableOpacity style={styles.chickTops} onPress={handlePromotion}>
-                                    <Text style={styles.TextPromotion2}> {selectedCoupon ? selectedCoupon.code : 'ใช้คูปอง'}</Text>
-                                    <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.payment}>
-                                <Text style={styles.TextPromotion1}>ชำระเงินโดย</Text>
-                                <TouchableOpacity style={styles.LayoutPayment}>
-                                    <MaterialIcons name="qr-code-2" size={35} color="black" width='10%' />
-                                    <Text style={styles.TextPayment}>ชำระผ่าน QR code</Text>
-                                    <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginRight={10} marginLeft='auto' />
-                                </TouchableOpacity>
-                            </View>
-                            {qrCode && (
-                                <View style={styles.QRcode}>
-                                    <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
-                                    <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
 
 
-                                    <View>
-                                        {selectedImage && (
-                                            <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
-                                        )}
-
-                                        <Text style={styles.QRcodeDec}>การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ" หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น" </Text>
-                                        {error && (
-                                            <Text style={styles.errorText}>{error}</Text>
-                                        )}
-                                        <View style={styles.flexButton}>
-                                            <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
-                                                <Text style={styles.SlipTxt}>ส่งสลิป</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity onPress={uploadSlip}
-                                                style={styles.verifySlip}
-                                            >
-                                                {uploading && (<ActivityIndicator size="large" color="#0000ff" />
-                                                )}
-                                                <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
-                                            </TouchableOpacity>
-
-                                        </View>
-                                    </View>
-                                </View>
-
-
-                            )}
                         </View>
+
                     ))
 
+
                 )}
+                <View>
+                    <View style={styles.total}>
+                        <Text style={styles.totalPrice}>ราคารวม ฿{totalPriceBeforeDiscount.toFixed(2)}</Text>
+
+                        {selectedCoupon && (
+                            <View>
+                                <View style={styles.flexDiscount}>
+                                    <Text style={styles.discountLabel1}>ส่วนลด ({selectedCoupon.name})</Text>
+                                    <Text style={styles.discountLabel2}> -฿{discount.toFixed(2)}</Text>
+                                </View>
+                                <Text style={styles.finalPriceLabel}>ราคาสุทธิ: ฿{totalPrice.toFixed(2)}</Text>
+                            </View>
+
+                        )}
+                    </View>
+                    <View style={styles.Promotion}>
+                        <Text style={styles.TextPromotion1}>คูปอง</Text>
+                        <TouchableOpacity style={styles.chickTops} onPress={handlePromotion}>
+                            <Text style={styles.TextPromotion2}> {selectedCoupon ? selectedCoupon.code : 'ใช้คูปอง'}</Text>
+                            <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.payment}>
+                        <Text style={styles.TextPromotion1}>ชำระเงินโดย</Text>
+                        <TouchableOpacity style={styles.LayoutPayment}>
+                            <MaterialIcons name="qr-code-2" size={35} color="black" width='10%' />
+                            <Text style={styles.TextPayment}>ชำระผ่าน QR code</Text>
+                            <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginRight={10} marginLeft='auto' />
+                        </TouchableOpacity>
+                    </View>
+                    {qrCode && (
+                        <View style={styles.QRcode}>
+                            <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
+                            <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
+
+
+                            <View>
+                                {selectedImage && (
+                                    <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
+                                )}
+
+                                <Text style={styles.QRcodeDec}>การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ" หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น" </Text>
+                                {error && (
+                                    <Text style={styles.errorText}>{error}</Text>
+                                )}
+                                <View style={styles.flexButton}>
+                                    <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
+                                        <Text style={styles.SlipTxt}>ส่งสลิป</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={uploadSlip}
+                                        style={styles.verifySlip}
+                                    >
+                                        {uploading && (<ActivityIndicator size="large" color="#0000ff" />
+                                        )}
+                                        <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
+                                    </TouchableOpacity>
+
+                                </View>
+                            </View>
+                        </View>
+
+
+                    )}
+                </View>
             </ScrollView>
             <View style={styles.modal}>
                 <Modal visible={isModalVisible} >
