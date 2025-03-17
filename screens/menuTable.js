@@ -12,7 +12,6 @@ const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const MenuTableScreen = ({route, navigation  }) => {
     const [selectedTables, setSelectedTables] = useState([]);
 
-
     const handleOrderTogether = () => {
         navigation.navigate('menuList', {
             restaurantId: route.params.restaurantId,

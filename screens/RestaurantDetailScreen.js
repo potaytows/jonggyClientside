@@ -77,7 +77,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 
     try {
       const response = await axios.get(
-        `${apiheader}/reservation/getReservationsByUsername/${userInfo.username}`,
+        `${apiheader}/reservation/getActiveReservation/${userInfo.username}`,
         { params: { restaurantId: route.params.restaurantId } } 
     );
         const reservations = response.data;

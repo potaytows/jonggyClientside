@@ -19,7 +19,6 @@ const MenuChooseTableScreen = ({ route, navigation }) => {
             startTime:route.params.startTime,
             endTime:route.params.endTime
         });
-        console.log([selectedTable]);
     };
 
     useEffect(() => {
