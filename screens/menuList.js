@@ -131,7 +131,7 @@ const MenuList = ({ route, navigation }) => {
                         <Text style={styles.cartTotal1}>฿{totalPrice}</Text>
                         <TouchableOpacity
                             style={styles.confirmButton}
-                            onPress={() => navigation.navigate('reserve', { restaurantId: route.params.restaurantId })}
+                            onPress={() => navigation.navigate('reserve', { restaurantId: route.params.restaurantId,endTime:route.params.endTime,startTime:route.params.startTime})}
                         >
                             <Text style={styles.confirmButtonText}>ดูรายการอาหาร</Text>
                         </TouchableOpacity>

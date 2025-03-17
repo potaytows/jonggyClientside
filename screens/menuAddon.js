@@ -50,6 +50,7 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
     };
 
     const handleAddCart = async () => {
+
         const selectedAddons = addons.filter((addon, index) => checkedItems[index]);
         const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
         const username = login.username
@@ -73,13 +74,11 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
         try {
             await axios.post(apiheader + '/cart/addToCart', cartData);
             closeModal(); // Close modal after adding to cart
-            console.log('Cart data added successfully!');
             return 0; // Success code
             
         } catch (error) {
             console.error('Error adding cart data: ', error);
         }
-        console.log(route.params.startTime)
         navigation.navigate('reserve',
             {
                 restaurantId: route.params.restaurantId,
@@ -102,7 +101,7 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
 
     return (
         <View style={styles.modalContent}>
-            <Text style={styles.titleAddmenu} > เพิ่มรายการใหม่</Text>
+            <Text style={styles.titleAddmenu} >เพิ่มรายการใหม่</Text>
             {selectedMenuItem && (
                 <View>
                     <View style={styles.modalHeader}>
@@ -147,12 +146,13 @@ const MenuAddonScreen = ({ route, navigation, closeModal }) => {
                 ))}
             </ScrollView>
 
-            <TouchableOpacity style={styles.addToCartButton} onPress={handleAddCart}>
+            <TouchableOpacity style={styles.addToCartButton} onPress={()=>{handleAddCart()}}>
                 <Text style={styles.buttonText}>เพิ่มไปยังตะกร้าอาหาร</Text>
             </TouchableOpacity>
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     modalContent: {

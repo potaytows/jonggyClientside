@@ -113,10 +113,8 @@ const ReservationScreen = ({ navigation, route }) => {
             const carts = await response.data;
 
             if (carts && carts.length > 0) {
-                // Collect current tables from the screen
                 const currentTables = route.params.selectedTables.map((table) => table._id);
 
-                // Loop through each cart and check if any selected table is missing
                 const cartsToDelete = [];
                 const validCarts = [];
 
@@ -124,23 +122,19 @@ const ReservationScreen = ({ navigation, route }) => {
                     const cartTables = cart.selectedTables.map((table) => table._id);
                     const missingTables = cartTables.filter((tableId) => !currentTables.includes(tableId));
 
-                    // If there are missing tables in the cart, add to delete list
                     if (missingTables.length > 0) {
-                        cartsToDelete.push(cart._id);  // Collect the cart ID for deletion
+                        cartsToDelete.push(cart._id);  
                     } else {
-                        validCarts.push(cart);  // Add valid cart to the list
+                        validCarts.push(cart); 
                     }
                 });
 
                 if (cartsToDelete.length > 0) {
-                    // Delete multiple carts
                     await Promise.all(
                         cartsToDelete.map(cartId => axios.delete(apiheader + '/cart/deleteCartById/' + cartId))
                     );
                     console.log('Carts deleted because some tables no longer exist.');
                 }
-
-                // Update state with only valid carts
                 setCartItems(validCarts);
             }
         } catch (error) {
@@ -152,9 +146,14 @@ const ReservationScreen = ({ navigation, route }) => {
         try {
             const response = await axios.delete(apiheader + '/cart/deleteCartById/' + id);
             const result = await response.data;
-
         } catch (error) {
             console.error(error);
+        }finally{
+            const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+            const username = login.username;
+            const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);  // Modify to get all carts for the user in the restaurant
+            const carts = await response.data;
+            setCartItems(carts)
         }
     };
     const fetchReserveTables = async () => {
@@ -212,10 +211,15 @@ const ReservationScreen = ({ navigation, route }) => {
             fetchCart();
         }, [])
     );
+    useFocusEffect(
+        React.useCallback(() => {
+            console.log(route.params.startTime+" "+route.params.endTime);
+        }, [route.params.startTime || route.params.endTime])
+    );
+
 
     useEffect(() => {
         fetchRestaurantDetails();
-        console.log(route.params)
         setSelectedTables(route.params.selectedTables || []);
     }, []);
 
@@ -247,7 +251,9 @@ const ReservationScreen = ({ navigation, route }) => {
                             ))}
                         </Text>
                         <Text style={styles.selectedTables}>
+                            {/* {moment(route.params.startTime).format('HH:mm')} - {moment(route.params.endTime).format('HH:mm')} */}
                             {moment(route.params.startTime).format('HH:mm')} - {moment(route.params.endTime).format('HH:mm')}
+
                         </Text>
                     </View>
                     <TouchableOpacity style={styles.button} onPress={handleGetMenu}>
@@ -305,7 +311,7 @@ const ReservationScreen = ({ navigation, route }) => {
                                                     <Text style={styles.Ui}>{item.totalPrice}</Text>
                                                 </View>
                                                 <View style={styles.MenuLi4}>
-                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id); fetchCart(); }}>
+                                                    <TouchableOpacity onPress={() => { fetchDeleteCart(item._id); }}>
                                                         <Text style={styles.Delete}>ลบ</Text>
                                                     </TouchableOpacity>
                                                 </View>
