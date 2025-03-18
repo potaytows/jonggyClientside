@@ -181,7 +181,7 @@ const ReserveTime = ({ navigation, route }) => {
                             onPress={() => setExpandedTables(prev => ({ ...prev, [table._id]: !prev[table._id] }))}
                             style={styles.tableHeader}
                         >
-                            <Text style={styles.tableTitle}>{table.text}</Text>
+                            <Text style={styles.tableTitle}>โต๊ะ {table.text}</Text>
                             <AntDesign name={expandedTables[table._id] ? "up" : "down"} size={20} color="black" />
                         </TouchableOpacity>
                         {expandedTables[table._id] && (
