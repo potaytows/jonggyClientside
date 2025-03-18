@@ -1,12 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView,RefreshControl } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import Text from '../component/Text';
 import * as SecureStore from 'expo-secure-store';
 import { Dimensions } from 'react-native';
-
+import { useCallback } from 'react';
 const screenWidth = Dimensions.get('window').width;
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -14,10 +14,14 @@ const HomeScreen = ({ navigation }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-
+  const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef();
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchRestaurants(); // Call your function to fetch data
+    setRefreshing(false);
+  }, []);
   const fetchRestaurants = async () => {
     if (searchQuery) {
       try {
@@ -83,7 +87,9 @@ const HomeScreen = ({ navigation }) => {
   }, [currentIndex, restaurants]);
 
   return (
-    <ScrollView>
+    <ScrollView refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    }>
       <View style={styles.container}>
         <LinearGradient style={styles.header}
           colors={['#FB992C', '#EC7A45']} start={{ x: 0.2, y: 0.8 }}>
@@ -163,7 +169,7 @@ const HomeScreen = ({ navigation }) => {
 
         {searchQuery === '' && (
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} >
             <View style={styles.restaurantListContainer}>
               {restaurants !== undefined ? (
                 restaurants.map((item, index) => (

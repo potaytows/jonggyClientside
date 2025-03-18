@@ -78,13 +78,13 @@ const ReservationListScreen = ({ route, navigation }) => {
                                 styles.status,
                                 {
                                     backgroundColor:
-                                        (!item.payment || item.payment.length === 0) ? '#FFA500' : // Orange for "รอการจ่ายเงิน"
+                                        (!item.Payment || item.Payment.length === 0) ? '#FFA500' : // Orange for "รอการจ่ายเงิน"
                                             item.status === "ยืนยันแล้ว" ? '#1FD46D' : // Green
                                                 item.status === "ยกเลิกการจองแล้ว" ? 'gray' :
                                                     '#D3D3D3' // Default light gray
                                 }
                             ]}>
-                                {(!item.payment || item.payment.length === 0) ? "รอการจ่ายเงิน" : item.status}
+                                {(!item.Payment || item.Payment.length === 0) ? "รอการจ่ายเงิน" : item.status}
                             </Text>
                         </View>
 

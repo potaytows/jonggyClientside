@@ -152,10 +152,10 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             setUploading(true); 
             setUploadResult(null); 
             setError(null); 
-
+            console.log(reservation.total)
             const fileBuffer = await fetch(selectedImage).then((res) => res.arrayBuffer());
             const fileName = selectedImage.split('/').pop();
-            const totalP = reservation.totalPrice;
+            const totalP = reservation.total
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
             const reservationId = reservation._id
@@ -200,6 +200,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
         }
     }, [isArrived])
     useEffect(() => {
+        console.log(reservation.Payment)
         const genqr = async (amount) => {
             try {
                 const response = await axios.post(apiheader + '/payment/createQRpayment', {
@@ -242,11 +243,11 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                         <Text>โต๊ะ: {reservation.reservedTables.map(table => table.text).join(', ')}</Text>
                         <Text style={[
                             styles.statusres,
-                            (!reservation.payment || reservation.payment.length === 0) && { color: 'orange' },
+                            (!reservation.Payment || reservation.Payment.length === 0) && { color: 'orange' },
                             reservation.status === "ยืนยันแล้ว" && { color: 'green' },
                             reservation.status === "ยกเลิกการจองแล้ว" && { color: 'red' }
                         ]}>
-                            {(!reservation.payment || reservation.payment.length === 0)
+                            {(!reservation.Payment || reservation.Payment.length === 0)
                                 ? "รอการจ่ายเงิน"
                                 : reservation.status}
                         </Text>
