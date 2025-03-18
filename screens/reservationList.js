@@ -19,17 +19,17 @@ const ReservationListScreen = ({ route, navigation }) => {
         try {
             const userCredentials = await SecureStore.getItemAsync('userCredentials');
             if (!userCredentials) {
-                
+
                 navigation.navigate('profile');
-                return; 
+                return;
             }
             const { username } = JSON.parse(userCredentials);
             if (!username) {
-               
+
                 navigation.navigate('profile');
-                return; 
+                return;
             }
-    
+
             const response = await axios.get(apiheader + '/reservation/getReservationsByUsername/' + username);
             const result = await response.data;
             setReservationList(result);
@@ -58,7 +58,7 @@ const ReservationListScreen = ({ route, navigation }) => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -74,12 +74,20 @@ const ReservationListScreen = ({ route, navigation }) => {
                     </View>
                     <View style={styles.box}>
                         <View style={styles.flexLists}>
-                            <Text style={styles.NameResList}>{item.restaurant_id.restaurantName}</Text>
-                            <Text style={[styles.status,
-                            item.status === "ยืนยันแล้ว" && { backgroundColor: '#1FD46D' },
-                            item.status === "ยกเลิกการจองแล้ว" && { backgroundColor: 'gray' }]}>{item.status}</Text>
-
+                            <Text style={[
+                                styles.status,
+                                {
+                                    backgroundColor:
+                                        (!item.payment || item.payment.length === 0) ? '#FFA500' : // Orange for "รอการจ่ายเงิน"
+                                            item.status === "ยืนยันแล้ว" ? '#1FD46D' : // Green
+                                                item.status === "ยกเลิกการจองแล้ว" ? 'gray' :
+                                                    '#D3D3D3' // Default light gray
+                                }
+                            ]}>
+                                {(!item.payment || item.payment.length === 0) ? "รอการจ่ายเงิน" : item.status}
+                            </Text>
                         </View>
+
 
                         <View style={styles.flexList} >
                             <Image
@@ -168,10 +176,10 @@ const styles = StyleSheet.create({
         alignItems: 'center'
 
     },
-    flexListss:{
-         flexDirection: 'row',
+    flexListss: {
+        flexDirection: 'row',
         alignItems: 'center',
-        marginTop:10
+        marginTop: 10
     },
     box: {
         flex: 1,
@@ -182,9 +190,9 @@ const styles = StyleSheet.create({
         width: '25%',
     },
     imgres: {
-        width:'100%',
-        height:100,
-        margin:'auto'
+        width: '100%',
+        height: 100,
+        margin: 'auto'
     },
     NameResList: {
         fontSize: 18,
@@ -193,20 +201,20 @@ const styles = StyleSheet.create({
     },
     status: {
         fontSize: 15,
-        fontWeight:'bold',
+        fontWeight: 'bold',
         color: 'white',
         marginLeft: 'auto',
-        backgroundColor:'yellow',
-        padding:5,
-        paddingLeft:15,
-        paddingRight:15,
-        borderRadius:20
+        backgroundColor: 'orange',
+        padding: 5,
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderRadius: 20
 
     },
     TotalList: {
         marginLeft: 'auto',
-        fontSize:18,
-        fontWeight:'bold'
+        fontSize: 18,
+        fontWeight: 'bold'
     },
     timeList: {
     },
@@ -219,8 +227,8 @@ const styles = StyleSheet.create({
     history: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginTop:10,
-    
+        marginTop: 10,
+
     },
     reservationItem: {
         marginTop: 20

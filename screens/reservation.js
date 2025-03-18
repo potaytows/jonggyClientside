@@ -20,6 +20,8 @@ const ReservationScreen = ({ navigation, route }) => {
     const [selectedTables, setSelectedTables] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [qrCode, setQrCode] = useState(null);
+    const [reservationID, setReservationId] = useState(null);
+
     const [selectedImage, setSelectedImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
@@ -52,8 +54,7 @@ const ReservationScreen = ({ navigation, route }) => {
             const totalP = totalPrice;
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
-
-            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username });
+            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username,reservationID});
 
             socket.on('uploadSlipSuccess', (response) => {
                 setUploading(false);
@@ -168,6 +169,7 @@ const ReservationScreen = ({ navigation, route }) => {
             const result = await response.data;
             if (result.status == "reserved successfully") {
                 const totalP = totalPrice;
+                setReservationId(result._id)
                 try {
                     const response = await axios.post(apiheader + '/payment/createQRpayment', {
                         amount: totalP,

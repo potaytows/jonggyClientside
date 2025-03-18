@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Alert ,Modal} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Modal,ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import Directions from 'react-native-maps-directions';
+import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import io from 'socket.io-client';
+import * as ImagePicker from 'expo-image-picker';
 import Text from '../component/Text';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
@@ -13,11 +15,29 @@ const socket = io(apiheader);
 const ReservationDetailScreen = ({ route, navigation }) => {
     const { reservation } = route.params;
     const [location, setLocation] = useState(null);
+    const [uploadResult, setUploadResult] = useState(null);
+
+    const [uploading, setUploading] = useState(false);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [isArrived, setIsArrived] = useState(false);
     const [isMapVisible, setIsMapVisible] = useState(true);
     const reservationID = reservation._id;
     const [showPopup, setShowPopup] = useState(false);
+    const [qrCode, setQrCode] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [error, setError] = useState(null);
+
+    const selectImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: false,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setSelectedImage(result.assets[0].uri);
+        }
+    };
     useEffect(() => {
         const fetchRestaurantLocation = async () => {
             try {
@@ -57,8 +77,8 @@ const ReservationDetailScreen = ({ route, navigation }) => {
         fetchRestaurantLocation();
         fetchCurrentLocation();
     }, [reservation.restaurant_id._id]);
-    
-    const cancelReservation = async()=>{
+
+    const cancelReservation = async () => {
         Alert.alert(
             "คุณต้องการยกเลิกการจองหรือไม่",
             "หากยกเลิกการจองไปแล้วคุณจะไม่สามารถ ทำอะไรกับการจองนี้ได้อีก",
@@ -75,7 +95,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                             const result = await response.data;
                             navigation.goBack();
                         } catch (error) {
-                            console.error(error);
+                            console.log(error);
                         }
                     },
                 },
@@ -125,6 +145,41 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             setIsMapVisible(false);
         }
     };
+    const uploadSlip = async () => {
+        if (!selectedImage) return;
+
+        try {
+            setUploading(true); 
+            setUploadResult(null); 
+            setError(null); 
+
+            const fileBuffer = await fetch(selectedImage).then((res) => res.arrayBuffer());
+            const fileName = selectedImage.split('/').pop();
+            const totalP = reservation.totalPrice;
+            const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+            const username = login.username;
+            const reservationId = reservation._id
+            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username,reservationId });
+
+            socket.on('uploadSlipSuccess', (response) => {
+                setUploading(false);
+                setUploadResult(`${response.message}`);
+                setModalVisible(true);
+                setTimeout(() => {
+                    setModalVisible(false);
+                    navigation.navigate('tab', { reservation: response.reservationId });
+                }, 5000);
+            });
+
+            socket.on('uploadSlipError', (error) => {
+                setUploading(false);
+                setError(`${error.message}`);
+            });
+        } catch (e) {
+            setUploading(false);
+            setError(`Error: ${e.message}`);
+        }
+    };
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -137,14 +192,32 @@ const ReservationDetailScreen = ({ route, navigation }) => {
 
     useEffect(() => {
         if (isArrived) {
-          setShowPopup(true);
-          const timer = setTimeout(() => {
-            setShowPopup(false);
-          }, 3000);
-          return () => clearTimeout(timer);
+            setShowPopup(true);
+            const timer = setTimeout(() => {
+                setShowPopup(false);
+            }, 3000);
+            return () => clearTimeout(timer);
         }
-      }, [isArrived])
-
+    }, [isArrived])
+    useEffect(() => {
+        const genqr = async (amount) => {
+            try {
+                const response = await axios.post(apiheader + '/payment/createQRpayment', {
+                    amount: amount,
+                });
+                if (response.data.qrCodeUrl) {
+                    setQrCode(response.data.qrCodeUrl);
+                } else {
+                    console.log('Error generating QR Code');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        if (!reservation?.Payment || reservation.Payment.length === 0) {
+            genqr(reservation.totalPrice)
+        }
+    }, [reservation]);
     if (!reservation) {
         return (
             <View style={styles.container}>
@@ -167,9 +240,17 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                         </View>
                         <Text>รหัสการจอง: {reservation._id}</Text>
                         <Text>โต๊ะ: {reservation.reservedTables.map(table => table.text).join(', ')}</Text>
-                        <Text style={[styles.statusres,
-                        reservation.status === "ยืนยันแล้ว" && { color: 'green' },
-                        reservation.status === "ยกเลิกการจองแล้ว" && { color: 'red' }]}>{reservation.status}</Text>
+                        <Text style={[
+                            styles.statusres,
+                            (!reservation.payment || reservation.payment.length === 0) && { color: 'orange' },
+                            reservation.status === "ยืนยันแล้ว" && { color: 'green' },
+                            reservation.status === "ยกเลิกการจองแล้ว" && { color: 'red' }
+                        ]}>
+                            {(!reservation.payment || reservation.payment.length === 0)
+                                ? "รอการจ่ายเงิน"
+                                : reservation.status}
+                        </Text>
+
                     </View>
                     <View style={styles.cardmanu}>
                         <Text style={styles.sectionTitle}>รายการอาหาร</Text>
@@ -206,47 +287,47 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                         ))}
                         <Text style={styles.totalReservation}>ราคารวม ฿{reservation.total}</Text>
                     </View>
-                           
-                    {isMapVisible && reservation.statusLocation !== 'hideLocation' && (
-                       
-                        <View  style={styles.mapview}>
-                        <MapView
-                            style={styles.map}
-                            showsUserLocation={true}
-                            initialRegion={{
-                                latitude: location ? location.coordinates.latitude : 0,
-                                longitude: location ? location.coordinates.longitude : 0,
-                                latitudeDelta: 0.005,
-                                longitudeDelta: 0.005,
-                            }}
-                        >
-                            {location && (
-                                <Marker
-                                    coordinate={{
-                                        latitude: location.coordinates.latitude,
-                                        longitude: location.coordinates.longitude,
-                                    }}
-                                    title={reservation.restaurant_id.restaurantName}
-                                    description={location.address}
-                                >
-                                    <Image source={require('../assets/images/restaurant.png')} style={{ height: 40, width: 40 }} />
-                                </Marker>
-                            )}
 
-                            {currentLocation && location && (
-                                <Directions
-                                    origin={currentLocation}
-                                    destination={{
-                                        latitude: location.coordinates.latitude,
-                                        longitude: location.coordinates.longitude,
-                                    }}
-                                    apikey='AIzaSyC_fdB6VOZvieVkKPSHdIFhIlVuhhXynyw'
-                                    strokeWidth={5}
-                                    strokeColor="#FF914D"
-                                    onReady={checkArrival}
-                                />
-                            )}
-                        </MapView>
+                    {isMapVisible && reservation.statusLocation !== 'hideLocation' && (
+
+                        <View style={styles.mapview}>
+                            <MapView
+                                style={styles.map}
+                                showsUserLocation={true}
+                                initialRegion={{
+                                    latitude: location ? location.coordinates.latitude : 0,
+                                    longitude: location ? location.coordinates.longitude : 0,
+                                    latitudeDelta: 0.005,
+                                    longitudeDelta: 0.005,
+                                }}
+                            >
+                                {location && (
+                                    <Marker
+                                        coordinate={{
+                                            latitude: location.coordinates.latitude,
+                                            longitude: location.coordinates.longitude,
+                                        }}
+                                        title={reservation.restaurant_id.restaurantName}
+                                        description={location.address}
+                                    >
+                                        <Image source={require('../assets/images/restaurant.png')} style={{ height: 40, width: 40 }} />
+                                    </Marker>
+                                )}
+
+                                {currentLocation && location && (
+                                    <Directions
+                                        origin={currentLocation}
+                                        destination={{
+                                            latitude: location.coordinates.latitude,
+                                            longitude: location.coordinates.longitude,
+                                        }}
+                                        apikey='AIzaSyC_fdB6VOZvieVkKPSHdIFhIlVuhhXynyw'
+                                        strokeWidth={5}
+                                        strokeColor="#FF914D"
+                                        onReady={checkArrival}
+                                    />
+                                )}
+                            </MapView>
                         </View>
                     )}
 
@@ -257,6 +338,39 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                                 <Text style={styles.buttonText}>แชทกับร้านค้า</Text>
                             </View>
                         </TouchableOpacity>
+                    )}
+                    {qrCode && (
+                        <View style={styles.QRcode}>
+                            <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
+                            <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
+
+
+                            <View>
+                                {selectedImage && (
+                                    <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
+                                )}
+
+                                <Text style={styles.QRcodeDec}>การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ" หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น" </Text>
+                                {error && (
+                                    <Text style={styles.errorText}>{error}</Text>
+                                )}
+                                <View style={styles.flexButton}>
+                                    <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
+                                        <Text style={styles.SlipTxt}>ส่งสลิป</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={uploadSlip}
+                                        style={styles.verifySlip}
+                                    >
+                                        {uploading && (<ActivityIndicator size="large" color="#0000ff" />
+                                        )}
+                                        <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
+                                    </TouchableOpacity>
+
+                                </View>
+                            </View>
+                        </View>
+
+
                     )}
                 </View>
             </ScrollView>
@@ -276,26 +390,27 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                 </View>
             )}
             <Modal
-                           animationType="fade"
-                           transparent={true}
-                           visible={showPopup}
-                           onRequestClose={() => setShowPopup(false)} 
-                         >
-                           <View style={styles.modalContainer}>
-                             <View style={styles.modalView}>
-                               <Text style={styles.modalText}>คุณมาถึงร้านอาหารแล้ว ขอให้เป็นมื้อที่ดี</Text>
-                             </View>
-                           </View>
-                         </Modal>
+                animationType="fade"
+                transparent={true}
+                visible={showPopup}
+                onRequestClose={() => setShowPopup(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>คุณมาถึงร้านอาหารแล้ว ขอให้เป็นมื้อที่ดี</Text>
+                    </View>
+                </View>
+            </Modal>
+
         </View>
-        
+
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor:'white',
+        backgroundColor: 'white',
 
     },
     restaurantContainer: {
@@ -397,7 +512,7 @@ const styles = StyleSheet.create({
     },
     chat: {
         flexDirection: 'row',
-        marginTop:20,
+        marginTop: 20,
 
     },
     image: {
@@ -430,7 +545,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         borderRadius: 10,
         padding: 10,
-        
+
     },
     buttonGotores: {
         backgroundColor: '#FF914D',
@@ -446,7 +561,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         borderRadius: 10,
         padding: 10,
-        
+
     },
     buttonGotores2: {
         backgroundColor: 'red',
@@ -461,12 +576,12 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: 300,
-        
+
     },
-    mapview:{
-        padding:5,
-        backgroundColor:'white',
-        marginTop:20,
+    mapview: {
+        padding: 5,
+        backgroundColor: 'white',
+        marginTop: 20,
         shadowOffset: {
             width: 0,
             height: 0,
@@ -480,9 +595,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        
-      },
-      modalView: {
+
+    },
+    modalView: {
         position: 'absolute',
         top: 0,
         left: 0,
@@ -499,12 +614,45 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        borderRadius: 0, 
+        borderRadius: 0,
     },
-      modalText: {
+    modalText: {
         fontSize: 18,
         textAlign: 'center',
-      },
+    }, QRcode: {
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginBottom: 60
+    },
+    QRcodeimg: {
+        width: 200,
+        height: 200,
+        margin: 'auto'
+    },
+    QRcodeTitle: {
+        textAlign: 'center',
+        fontSize: 18
+    }, sendSlip: {
+        backgroundColor: 'green',
+        width: '30%',
+        padding: 10,
+        margin: 5,
+        borderRadius: 10
+    }, SlipTxt: {
+        fontSize: 16,
+        color: 'white',
+        textAlign: 'center'
+    }, verifySlip: {
+        backgroundColor: 'orange',
+        width: '30%',
+        padding: 10,
+        margin: 5,
+        borderRadius: 10
+
+    }, flexButton: {
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
 });
 
 export default ReservationDetailScreen;
