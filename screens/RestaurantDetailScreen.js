@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid,Alert } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AutoHeightImage from 'react-native-auto-height-image'
@@ -25,34 +25,67 @@ const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const RestaurantDetailScreen = ({ route, navigation }) => {
   const [obj, setData] = useState([]);
   const [selected, setSelected] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [request, setRequest] = useState('');
   const [restaurantDetails, setRestaurantDetails] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const getUserDetail = async () => {
+    const userCredentials = await SecureStore.getItemAsync('userCredentials');
+    if (!userCredentials) return navigation.navigate('Login');
 
-  const CheckExistingOrder = async () => {
-
-    const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
-    const username = login.username
-    const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);
-    const result = await response.data;
-    result.map((menu, index) => {
-      if (menu.OrderTableType == "SingleTable") {
-        const exists = selected.find((table) => table._id == menu.selectedTables[0]._id)
-        if (!exists) {
-          fetchDeleteCart(menu._id);
-        }
-      }
-    })
-
-  }
-  const fetchDeleteCart = async (id) => {
+    const { username } = JSON.parse(userCredentials);
     try {
-      const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
-      const result = await response.data;
+      const response = await axios.get(`${apiheader}/users/getusers/${username}`);
+      const result = response.data;
 
+      if (result?.isBanned) {
+        await SecureStore.deleteItemAsync('userCredentials');
+        navigation.navigate('Login');
+      } else {
+        setFavorites(result.favorites || []);
+      }
     } catch (error) {
       console.error(error);
+    }
+  };
+  // const CheckExistingOrder = async () => {
+
+  //   const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
+  //   const username = login.username
+  //   const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);
+  //   const result = await response.data;
+  //   result.map((menu, index) => {
+  //     if (menu.OrderTableType == "SingleTable") {
+  //       const exists = selected.find((table) => table._id == menu.selectedTables[0]._id)
+  //       if (!exists) {
+  //         fetchDeleteCart(menu._id);
+  //       }
+  //     }
+  //   })
+
+  // }
+  // const fetchDeleteCart = async (id) => {
+  //   try {
+  //     const response = await axios.get(apiheader + '/cart/deleteCart/' + id);
+  //     const result = await response.data;
+
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  const toggleFavorite = async (restaurantId) => {
+    try {
+      const userCredentials = await SecureStore.getItemAsync('userCredentials');
+      const { username } = JSON.parse(userCredentials);
+      const response = await axios.post(`${apiheader}/users/favorite`, {
+        username,
+        restaurantId
+      });
+      setFavorites(response.data.favorites);
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+      alert('Failed to update favorites');
     }
   };
   const checkLoginStatus = async () => {
@@ -71,40 +104,40 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 
   const handleComplete = async () => {
     if (!isLoggedIn) {
-        navigation.navigate('profile');
-        return;
+      navigation.navigate('profile');
+      return;
     }
 
     try {
       const response = await axios.get(
         `${apiheader}/reservation/getActiveReservation/${userInfo.username}`,
-        { params: { restaurantId: route.params.restaurantId } } 
-    );
-        const reservations = response.data;
+        { params: { restaurantId: route.params.restaurantId } }
+      );
+      const reservations = response.data;
 
-        if (reservations.length > 0) {
-          Alert.alert(
-            "คุณมีการจองอยู่แล้ว",  
-            "คุณมีการจองที่ร้านนี้อยู่แล้ว ต้องการดูรายการจองของคุณหรือไม่?",
-            [
-                { text: "ยกเลิก", style: "cancel" },
-                { 
-                    text: "ดูรายการจอง", 
-                    onPress: () => navigation.navigate('tab', { screen: 'reservationList' }) 
-                }
-            ]
+      if (reservations.length > 0) {
+        Alert.alert(
+          "คุณมีการจองอยู่แล้ว",
+          "คุณมีการจองที่ร้านนี้อยู่แล้ว ต้องการดูรายการจองของคุณหรือไม่?",
+          [
+            { text: "ยกเลิก", style: "cancel" },
+            {
+              text: "ดูรายการจอง",
+              onPress: () => navigation.navigate('tab', { screen: 'reservationList' })
+            }
+          ]
         );
-        } else {
-            navigation.navigate('selectReserveTime', {
-                restaurantId: route.params.restaurantId,
-                restaurantName: restaurantDetails.restaurantName,
-                selectedTables: selected,
-            });
-        }
+      } else {
+        navigation.navigate('selectReserveTime', {
+          restaurantId: route.params.restaurantId,
+          restaurantName: restaurantDetails.restaurantName,
+          selectedTables: selected,
+        });
+      }
     } catch (error) {
-        console.error('Error checking reservation:', error);
+      console.error('Error checking reservation:', error);
     }
-};
+  };
   function compareObjs(obj1, obj2) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
@@ -131,7 +164,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
   useEffect(() => {
     checkLoginStatus();
     getTables();
-
+    getUserDetail();
   }, []);
   useFocusEffect(
     React.useCallback(() => {
@@ -153,9 +186,14 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           <View style={styles.restaurantContainer}>
             <View style={styles.layoutlogoRes}>
-              <Image style={styles.logoRes}  source={{ uri: `${apiheader}/image/getRestaurantIcon/${restaurantDetails._id}?timestamp=${new Date().getTime()}` }}  />
+              <Image style={styles.logoRes} source={{ uri: `${apiheader}/image/getRestaurantIcon/${restaurantDetails._id}?timestamp=${new Date().getTime()}` }} />
             </View>
-            <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
+            <View style={styles.nameContainer}>
+              <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
+              <TouchableOpacity onPress={() => toggleFavorite(restaurantDetails._id)} style={styles.favoriteIcon}>
+                <FontAwesome name={favorites.includes(restaurantDetails._id) ? "star" : "star-o"} size={24} color="gold" />
+              </TouchableOpacity>
+            </View>
 
           </View>
           <View style={styles.layoutGuid}>
@@ -171,19 +209,20 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
 
             </View>
           </View>
-          {obj.tables  != undefined ? (
-              <View style={styles.dragablecontainer}>
+          <View style={styles.dragablecontainer}>
+            {obj.tables != undefined ? (
+              <View>
                 {obj.tables.map((item, index) => (
                   <StaticTable item={item} key={index} selected={selected} setSelected={setSelected} />
                 ))}
               </View>
-
             ) : (
               <View></View>
             )}
-          
+          </View>
+
         </View>
-      </ScrollView>
+      </ScrollView >
       <View style={styles.viewshow} >
         <Text style={styles.showtable}>
           โต๊ะที่เลือก: {selected.map((item, index) => (
@@ -194,13 +233,13 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           ))}
         </Text>
 
-        <TouchableOpacity style={[styles.reserveButton ,selected.length === 0 && { backgroundColor: 'gray' },]} onPress={handleComplete}
+        <TouchableOpacity style={[styles.reserveButton, selected.length === 0 && { backgroundColor: 'gray' },]} onPress={handleComplete}
           disabled={selected.length === 0}
         >
           <Text style={styles.reserveButtonText}>ยืนยันการเลือกโต๊ะ</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </View >
 
 
   );
@@ -310,7 +349,7 @@ const styles = StyleSheet.create({
   image: {
     height: 30,
     width: 30,
-    
+
   },
   layoutGuid: {
     flex: 1,
@@ -331,8 +370,11 @@ const styles = StyleSheet.create({
   statusGuid: {
     marginLeft: 10,
     marginRight: 10
+  }, nameContainer: {
+    flexDirection: "row", // Puts name & star in a row
+    alignItems: "center", // Aligns them vertically
+    gap: 8, // Space between text and star
   }
-
 
 });
 
