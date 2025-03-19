@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView,RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, RefreshControl } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import Text from '../component/Text';
@@ -8,10 +8,13 @@ import * as SecureStore from 'expo-secure-store';
 import { Dimensions } from 'react-native';
 import { useCallback } from 'react';
 const screenWidth = Dimensions.get('window').width;
+import { useFocusEffect } from '@react-navigation/native';
 
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const HomeScreen = ({ navigation }) => {
+  const [imageUris, setImageUris] = useState({});
   const [restaurants, setRestaurants] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -19,7 +22,8 @@ const HomeScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchRestaurants(); // Call your function to fetch data
+    await fetchRestaurants();
+    await getUserDetail();
     setRefreshing(false);
   }, []);
   const fetchRestaurants = async () => {
@@ -45,21 +49,39 @@ const HomeScreen = ({ navigation }) => {
   };
   const getUserDetail = async () => {
     const userCredentials = await SecureStore.getItemAsync('userCredentials');
+    if (!userCredentials) return navigation.navigate('Login');
+
     const { username } = JSON.parse(userCredentials);
     try {
-      const response = await axios.get(apiheader + '/users/getusers/' + username)
-      const result = await response.data;
-      if (result?.isBanned == true) {
+      const response = await axios.get(`${apiheader}/users/getusers/${username}`);
+      const result = response.data;
+
+      if (result?.isBanned) {
         await SecureStore.deleteItemAsync('userCredentials');
         navigation.navigate('Login');
+      } else {
+        setFavorites(result.favorites || []);
       }
     } catch (error) {
       console.error(error);
     }
-
-
   };
 
+  const toggleFavorite = async (restaurantId) => {
+    try {
+      const userCredentials = await SecureStore.getItemAsync('userCredentials');
+      const { username } = JSON.parse(userCredentials);
+      const response = await axios.post(`${apiheader}/users/favorite`, {
+        username,
+        restaurantId
+      });
+
+      setFavorites(response.data.favorites);
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+      alert('Failed to update favorites');
+    }
+  };
   useEffect(() => {
     fetchRestaurants();
   }, [searchQuery]);
@@ -67,9 +89,31 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     fetchRestaurants();
     getUserDetail();
-
   }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchRestaurants();
+      getUserDetail();
+      return () => {
+        // Do something when the screen is unfocused
+        // Useful for cleanup functions
+      };
+    }, [])
+  );
+  useEffect(() => {
+    // Create a new image URI state only for restaurants that don't already have one
+    const newImageUris = {};
+    restaurants.forEach((restaurant) => {
+      if (!imageUris[restaurant._id]) {
+        newImageUris[restaurant._id] = `${apiheader}/image/getRestaurantIcon/${restaurant._id}?timestamp=${Date.now()}`;
+      }
+    });
 
+    // Update state only if there are new URIs
+    if (Object.keys(newImageUris).length > 0) {
+      setImageUris((prevUris) => ({ ...prevUris, ...newImageUris }));
+    }
+  }, [restaurants]);
   useEffect(() => {
     const interval = setInterval(() => {
       if (restaurants.length > 0) {
@@ -117,7 +161,7 @@ const HomeScreen = ({ navigation }) => {
         )}
         {searchQuery === '' && (
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} ref={scrollRef} style={{width:'100%'}}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} ref={scrollRef} style={{ width: '100%' }}>
             <TouchableOpacity style={styles.promotioncard}>
               <Image style={styles.promotions} source={require('../assets/images/pmtss1.png')} />
             </TouchableOpacity>
@@ -133,6 +177,45 @@ const HomeScreen = ({ navigation }) => {
           </ScrollView>
 
         )}
+        {searchQuery === '' && favorites.length > 0 && (
+          <Text style={styles.pmtsub}>ร้านโปรด</Text>
+        )}
+
+        {searchQuery == '' && favorites.length > 0 && (
+          <View style={styles.searchResContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+
+              {restaurants
+                .filter((restaurant) => favorites.includes(restaurant._id)) // Show only favorite restaurants
+                .map((item) => (
+                  <TouchableOpacity
+                    key={item._id}
+                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                  >
+                    <View style={styles.card}>
+                      <Image
+                        key={item._id}
+                        style={styles.logo}
+                        source={{ uri: imageUris[item._id] || "" }} // Ensure there's a valid URI
+                      />
+
+                      {/* Favorite Star Button */}
+                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                        <FontAwesome name="star" size={24} color="gold" />
+                      </TouchableOpacity>
+
+                      <View style={styles.text}>
+                        <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                        <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+            </ScrollView>
+
+          </View>
+
+        )}
 
         {searchQuery === '' && (
           <Text style={styles.pmtsub}>ร้านอาหารแนะนำ</Text>
@@ -143,19 +226,20 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.searchResContainer}>
               {restaurants !== undefined ? (
                 restaurants.map((item, index) => (
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
-                    key={item._id}
-                  >
-                    <View style={styles.searchcard}>
+                  <TouchableOpacity onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })} key={item._id}>
+                    <View style={styles.card}>
                       <Image
-                        style={styles.searchlogo}
-                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                        key={item._id}
+                        style={styles.logo}
+                        source={{ uri: imageUris[item._id] || "" }}
                       />
-                      <View style={styles.searchtext}>
-                        <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
-                        <Text style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.searchdistant}>ระยะทาง</Text>
+                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                        <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
+                      </TouchableOpacity>
+
+                      <View style={styles.text}>
+                        <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                        <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -173,19 +257,22 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.restaurantListContainer}>
               {restaurants !== undefined ? (
                 restaurants.map((item, index) => (
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
-                    key={item._id}
-                  >
+                  <TouchableOpacity onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })} key={item._id}>
                     <View style={styles.card}>
                       <Image
+                        key={item._id}
                         style={styles.logo}
-                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                        source={{ uri: imageUris[item._id] || "" }} // Ensure there's a valid URI
                       />
+
+                      {/* Favorite Star Icon */}
+                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                        <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
+                      </TouchableOpacity>
+
                       <View style={styles.text}>
                         <Text style={styles.restaurantName}>{item.restaurantName}</Text>
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.distant}>ระยะทาง km</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -206,21 +293,22 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.restaurantListContainer}>
               {restaurants !== undefined ? (
                 restaurants.map((item, index) => (
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
-                    key={item._id}
-                  >
+                  <TouchableOpacity onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })} key={item._id}>
                     <View style={styles.card}>
                       <Image
+                        key={item._id}
                         style={styles.logo}
-                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                        source={{ uri: imageUris[item._id] || "" }}
                       />
+                      {/* Favorite Star Icon */}
+                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                        <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
+                      </TouchableOpacity>
+
                       <View style={styles.text}>
                         <Text style={styles.restaurantName}>{item.restaurantName}</Text>
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.distant}>ระยะทาง km</Text>
                       </View>
-
                     </View>
                   </TouchableOpacity>
                 ))
@@ -234,26 +322,43 @@ const HomeScreen = ({ navigation }) => {
           <ScrollView>
             <View style={styles.underhResContainer}>
               {restaurants !== undefined ? (
-                restaurants.map((item, index) => (
+                restaurants.map((item) => (
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                    onPress={() =>
+                      navigation.navigate('RestaurantDetail', {
+                        restaurantId: item._id,
+                        restaurantName: item.restaurantName,
+                      })
+                    }
                     key={item._id}
                   >
                     <View style={styles.searchcard}>
                       <Image
+                        key={item._id}
                         style={styles.searchlogo}
-                        source={{ uri: `${apiheader}/image/getRestaurantIcon/${item._id}?timestamp=${new Date().getTime()}` }}
+                        source={{ uri: imageUris[item._id] || "" }}
                       />
                       <View style={styles.searchtext}>
                         <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
                         <Text style={styles.restaurantDescription}>{item.description}</Text>
-                        <Text style={styles.searchdistant}>ระยะทาง km</Text>
                       </View>
+
+                      {/* Star Icon for Favorite */}
+                      <TouchableOpacity onPress={() => toggleFavorite(item._id)}>
+                        <FontAwesome
+                          name={favorites.includes(item._id) ? 'star' : 'star-o'}
+                          size={24}
+                          color="gold"
+                          style={{ marginLeft: 'auto', padding: 10 }}
+                        />
+                      </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
                 ))
               ) : (
-                <View><Text>กำลังโหลดข้อมูล!</Text></View>
+                <View>
+                  <Text>กำลังโหลดข้อมูล!</Text>
+                </View>
               )}
             </View>
           </ScrollView>
@@ -360,7 +465,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginRight: 10,
     marginBottom: 10,
-    marginLeft: 0, 
+    marginLeft: 0,
     borderRadius: 10,
     backgroundColor: 'white',
   },
@@ -396,7 +501,7 @@ const styles = StyleSheet.create({
 
   },
   promotioncard: {
-    width: screenWidth * 0.9, 
+    width: screenWidth * 0.9,
     height: 200,
     marginLeft: 15,
     justifyContent: 'center',
@@ -404,7 +509,7 @@ const styles = StyleSheet.create({
   },
   promotions: {
     width: '100%',
-    height: '100%', 
+    height: '100%',
     resizeMode: 'cover',
     borderRadius: 10,
   },
@@ -424,6 +529,11 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 18,
     color: 'gray',
+  }, favoriteIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
   },
 });
 
