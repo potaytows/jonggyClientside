@@ -15,8 +15,8 @@ const ProfileScreen = ({ navigation }) => {
   const handleEditProfile = () => {
     navigation.navigate('EditProfile', { userInfo });
   };
-  const settime = () => {
-    navigation.navigate('selecttime', { userInfo });
+  const toFavortie = () => {
+    navigation.navigate('favorites');
   };
 
 
@@ -89,14 +89,8 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.Other}>
 
               <Text style={styles.textTitle}>บัญชีของฉัน</Text>
-              <TouchableOpacity style={styles.underline} onPress={settime} >
+              <TouchableOpacity style={styles.underline} onPress={toFavortie} >
                 <Text style={styles.textchick}>รายการโปรด</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.underline} >
-                <Text style={styles.textchick}>วิธีการชำระเงิน</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.underline} >
-                <Text style={styles.textchick}>สถานที่ที่ถูกบันทึกไว้</Text>
               </TouchableOpacity>
 
               <Text style={styles.textTitle}>ทั่วไป</Text>

@@ -95,21 +95,17 @@ const HomeScreen = ({ navigation }) => {
       fetchRestaurants();
       getUserDetail();
       return () => {
-        // Do something when the screen is unfocused
-        // Useful for cleanup functions
       };
     }, [])
   );
   useEffect(() => {
-    // Create a new image URI state only for restaurants that don't already have one
+    if (!Array.isArray(restaurants)) return;
     const newImageUris = {};
     restaurants.forEach((restaurant) => {
       if (!imageUris[restaurant._id]) {
         newImageUris[restaurant._id] = `${apiheader}/image/getRestaurantIcon/${restaurant._id}?timestamp=${Date.now()}`;
       }
     });
-
-    // Update state only if there are new URIs
     if (Object.keys(newImageUris).length > 0) {
       setImageUris((prevUris) => ({ ...prevUris, ...newImageUris }));
     }
@@ -185,32 +181,46 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.searchResContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
 
-              {restaurants
-                .filter((restaurant) => favorites.includes(restaurant._id)) // Show only favorite restaurants
-                .map((item) => (
-                  <TouchableOpacity
-                    key={item._id}
-                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
-                  >
-                    <View style={styles.card}>
-                      <Image
-                        key={item._id}
-                        style={styles.logo}
-                        source={{ uri: imageUris[item._id] || "" }} // Ensure there's a valid URI
-                      />
+              {Array.isArray(restaurants) && restaurants.length > 0 ? (
+                restaurants
+                  .filter((restaurant) => favorites.includes(restaurant._id)) // Show only favorite restaurants
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item._id}
+                      onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                    >
+                      <View style={styles.card}>
+                        <Image
+                          key={item._id}
+                          style={styles.logo}
+                          source={{ uri: imageUris[item._id] || "" }} // Ensure there's a valid URI
+                        />
 
-                      {/* Favorite Star Button */}
-                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
-                        <FontAwesome name="star" size={24} color="gold" />
-                      </TouchableOpacity>
+                        {/* Favorite Star Button */}
+                        <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                          <FontAwesome name="star" size={24} color="gold" />
+                        </TouchableOpacity>
 
-                      <View style={styles.text}>
-                        <Text style={styles.restaurantName}>{item.restaurantName}</Text>
-                        <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                        <View style={styles.text}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text>
+                            {item.status == "closed"&& 
+                            <Text style={{ color: 'red' }}>ปิด </Text>
+                            
+                            }
+                            <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                          </Text>
+                        </View>
+                          <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  ))
+              ) : (
+                <View>
+                  <Text>{restaurants === undefined ? "กำลังโหลดข้อมูล!" : "ไม่มีร้านอาหารที่ถูกใจ"}</Text>
+                </View>
+              )}
             </ScrollView>
 
           </View>
@@ -224,9 +234,12 @@ const HomeScreen = ({ navigation }) => {
         {searchQuery != '' && (
           <ScrollView>
             <View style={styles.searchResContainer}>
-              {restaurants !== undefined ? (
+              {Array.isArray(restaurants) ? (
                 restaurants.map((item, index) => (
-                  <TouchableOpacity onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })} key={item._id}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                    key={item._id}
+                  >
                     <View style={styles.card}>
                       <Image
                         key={item._id}
@@ -238,7 +251,16 @@ const HomeScreen = ({ navigation }) => {
                       </TouchableOpacity>
 
                       <View style={styles.text}>
-                        <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text>
+                            {item.status == "closed"&& 
+                            <Text style={{ color: 'red' }}>ปิด </Text>
+                            
+                            }
+                            <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                          </Text>
+                        </View>
+
                         <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
                       </View>
                     </View>
@@ -247,6 +269,7 @@ const HomeScreen = ({ navigation }) => {
               ) : (
                 <View><Text>กำลังโหลดข้อมูล!</Text></View>
               )}
+
             </View>
           </ScrollView>
         )}
@@ -255,28 +278,39 @@ const HomeScreen = ({ navigation }) => {
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} >
             <View style={styles.restaurantListContainer}>
-              {restaurants !== undefined ? (
-                restaurants.map((item, index) => (
-                  <TouchableOpacity onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })} key={item._id}>
-                    <View style={styles.card}>
-                      <Image
-                        key={item._id}
-                        style={styles.logo}
-                        source={{ uri: imageUris[item._id] || "" }} // Ensure there's a valid URI
-                      />
+              {Array.isArray(restaurants) ? (
+                restaurants
+                  .filter((item) => item.status === "open") // Only show restaurants with "open" status
+                  .map((item, index) => (
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                      key={item._id}
+                    >
+                      <View style={styles.card}>
+                        <Image
+                          key={item._id}
+                          style={styles.logo}
+                          source={{ uri: imageUris[item._id] || "" }}
+                        />
+                        <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                          <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
+                        </TouchableOpacity>
 
-                      {/* Favorite Star Icon */}
-                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
-                        <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
-                      </TouchableOpacity>
-
-                      <View style={styles.text}>
-                        <Text style={styles.restaurantName}>{item.restaurantName}</Text>
-                        <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                        <View style={styles.text}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text>
+                            {item.status == "closed"&& 
+                            <Text style={{ color: 'red' }}>ปิด </Text>
+                            
+                            }
+                            <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                          </Text>
+                        </View>
+                          <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                ))
+                    </TouchableOpacity>
+                  ))
               ) : (
                 <View><Text>กำลังโหลดข้อมูล!</Text></View>
               )}
@@ -291,75 +325,100 @@ const HomeScreen = ({ navigation }) => {
         {searchQuery === '' && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} >
             <View style={styles.restaurantListContainer}>
-              {restaurants !== undefined ? (
-                restaurants.map((item, index) => (
-                  <TouchableOpacity onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })} key={item._id}>
-                    <View style={styles.card}>
-                      <Image
-                        key={item._id}
-                        style={styles.logo}
-                        source={{ uri: imageUris[item._id] || "" }}
-                      />
-                      {/* Favorite Star Icon */}
-                      <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
-                        <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
-                      </TouchableOpacity>
+              {Array.isArray(restaurants) ? (
+                restaurants
+                  .filter((item) => item.status === "open") // Only show restaurants with "open" status
+                  .map((item, index) => (
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
+                      key={item._id}
+                    >
+                      <View style={styles.card}>
+                        <Image
+                          key={item._id}
+                          style={styles.logo}
+                          source={{ uri: imageUris[item._id] || "" }}
+                        />
+                        <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
+                          <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
+                        </TouchableOpacity>
 
-                      <View style={styles.text}>
-                        <Text style={styles.restaurantName}>{item.restaurantName}</Text>
-                        <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                        <View style={styles.text}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text>
+                            {item.status == "closed"&& 
+                            <Text style={{ color: 'red' }}>ปิด </Text>
+                            
+                            }
+                            <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                          </Text>
+                        </View>
+                          <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                ))
+                    </TouchableOpacity>
+                  ))
               ) : (
                 <View><Text>กำลังโหลดข้อมูล!</Text></View>
               )}
+
             </View>
           </ScrollView>
         )}
         {searchQuery === '' && (
           <ScrollView>
             <View style={styles.underhResContainer}>
-              {restaurants !== undefined ? (
-                restaurants.map((item) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate('RestaurantDetail', {
-                        restaurantId: item._id,
-                        restaurantName: item.restaurantName,
-                      })
-                    }
-                    key={item._id}
-                  >
-                    <View style={styles.searchcard}>
-                      <Image
-                        key={item._id}
-                        style={styles.searchlogo}
-                        source={{ uri: imageUris[item._id] || "" }}
-                      />
-                      <View style={styles.searchtext}>
-                        <Text style={styles.searchrestaurantName}>{item.restaurantName}</Text>
-                        <Text style={styles.restaurantDescription}>{item.description}</Text>
-                      </View>
-
-                      {/* Star Icon for Favorite */}
-                      <TouchableOpacity onPress={() => toggleFavorite(item._id)}>
-                        <FontAwesome
-                          name={favorites.includes(item._id) ? 'star' : 'star-o'}
-                          size={24}
-                          color="gold"
-                          style={{ marginLeft: 'auto', padding: 10 }}
+              {Array.isArray(restaurants) ? (
+                restaurants
+                  .filter((item) => item.status === "open") // Only show restaurants with "open" status
+                  .map((item) => (
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('RestaurantDetail', {
+                          restaurantId: item._id,
+                          restaurantName: item.restaurantName,
+                        })
+                      }
+                      key={item._id}
+                    >
+                      <View style={styles.searchcard}>
+                        <Image
+                          key={item._id}
+                          style={styles.searchlogo}
+                          source={{ uri: imageUris[item._id] || "" }}
                         />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-                ))
+                        <View style={styles.searchtext}>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text>
+                            {item.status == "closed"&& 
+                            <Text style={{ color: 'red' }}>ปิด </Text>
+                            
+                            }
+                            <Text style={styles.restaurantName}>{item.restaurantName}</Text>
+                          </Text>
+                        </View>
+                          <Text style={styles.restaurantDescription}>{item.description}</Text>
+                        </View>
+
+                        {/* Star Icon for Favorite */}
+                        <TouchableOpacity onPress={() => toggleFavorite(item._id)}>
+                          <FontAwesome
+                            name={favorites.includes(item._id) ? 'star' : 'star-o'}
+                            size={24}
+                            color="gold"
+                            style={{ marginLeft: 'auto', padding: 10 }}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </TouchableOpacity>
+                  ))
               ) : (
                 <View>
                   <Text>กำลังโหลดข้อมูล!</Text>
                 </View>
               )}
+
+
             </View>
           </ScrollView>
         )}
@@ -379,6 +438,8 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:"white"
+    
   },
   header: {
     width: '100%',
@@ -472,6 +533,7 @@ const styles = StyleSheet.create({
   text: {
     padding: 10,
     paddingBottom: 0,
+
   },
   restaurantName: {
     fontSize: 16,
@@ -480,7 +542,7 @@ const styles = StyleSheet.create({
   },
   restaurantDescription: {
     fontSize: 14,
-    color: 'gray',
+    color: '  ',
 
   },
   distant: {

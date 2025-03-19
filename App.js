@@ -29,7 +29,7 @@ import ReservationListScreen from './screens/reservationList';
 import ReservationDetailScreen from './screens/reservationDetail';
 import ChatScreen from './screens/chat';
 import { NotificationProvider } from './screens/notification';
-import SelectTimeScreen from './screens/selectTime';
+import FavoritesScreen from './screens/favorites';
 import CouponScreen from './screens/coupon';
 import HelpCenterScreen from './screens/helpCenter';
 import SupportFormScreen from './screens/supportForm';
@@ -126,7 +126,7 @@ const App = () => {
             <Stack.Screen name="reservationDetail" component={ReservationDetailScreen} options={{ title: 'รายการจองของคุณ' }} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="RestaurantDetail" component={RestaurantDetailScreen} options={({ route }) => ({ title: route.params.restaurantName })} />
-            <Stack.Screen name="selecttime" component={SelectTimeScreen} />
+            <Stack.Screen name="favorites" component={FavoritesScreen}options={({ route }) => ({ title: "รายการโปรด" })} />
             <Stack.Screen name="coupon" component={CouponScreen} options={{ title: 'รายการจอง' }} />
             <Stack.Screen name="helpCenter" component={HelpCenterScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />
             <Stack.Screen name="supportForm" component={SupportFormScreen} options={{ title: 'ศูนย์ช่วยเหลือ' }} />

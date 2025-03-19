@@ -78,13 +78,15 @@ const ReservationListScreen = ({ route, navigation }) => {
                                 styles.status,
                                 {
                                     backgroundColor:
-                                        (!item.Payment || item.Payment.length === 0) ? '#FFA500' : // Orange for "รอการจ่ายเงิน"
-                                            item.status === "ยืนยันแล้ว" ? '#1FD46D' : // Green
-                                                item.status === "ยกเลิกการจองแล้ว" ? 'gray' :
+                                        item.status === "ยกเลิกการจองแล้ว" ? 'red' : // Case 4: Canceled reservation
+                                            (!item.Payment || item.Payment.length === 0) ? '#FFA500' : // Case 1 & 2: Waiting for payment
+                                                item.status === "ยืนยันแล้ว" ? '#1FD46D' : // Case 3: Confirmed and paid
                                                     '#D3D3D3' // Default light gray
                                 }
                             ]}>
-                                {(!item.Payment || item.Payment.length === 0) ? "รอการจ่ายเงิน" : item.status}
+                                {item.status === "ยกเลิกการจองแล้ว" ? "ยกเลิกการจองแล้ว" : // Display "ยกเลิกแล้ว" for canceled reservation
+                                    (!item.Payment || item.Payment.length === 0) ? "รอการจ่ายเงิน" :
+                                        item.status}
                             </Text>
                         </View>
 
@@ -252,8 +254,8 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     tableList: {
-        marginTop: 10
-
+        marginTop: 10,
+        marginLeft:5
     },
 
 });
