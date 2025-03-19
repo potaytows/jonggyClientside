@@ -21,7 +21,6 @@ const ReservationScreen = ({ navigation, route }) => {
     const [cartItems, setCartItems] = useState([]);
     const [qrCode, setQrCode] = useState(null);
     const [reservationID, setReservationId] = useState(null);
-
     const [selectedImage, setSelectedImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
@@ -54,7 +53,7 @@ const ReservationScreen = ({ navigation, route }) => {
             const totalP = totalPrice;
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
-            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username,reservationID});
+            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username, reservationID });
 
             socket.on('uploadSlipSuccess', (response) => {
                 setUploading(false);
@@ -124,9 +123,9 @@ const ReservationScreen = ({ navigation, route }) => {
                     const missingTables = cartTables.filter((tableId) => !currentTables.includes(tableId));
 
                     if (missingTables.length > 0) {
-                        cartsToDelete.push(cart._id);  
+                        cartsToDelete.push(cart._id);
                     } else {
-                        validCarts.push(cart); 
+                        validCarts.push(cart);
                     }
                 });
 
@@ -149,7 +148,7 @@ const ReservationScreen = ({ navigation, route }) => {
             const result = await response.data;
         } catch (error) {
             console.error(error);
-        }finally{
+        } finally {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
             const response = await axios.get(apiheader + '/cart/getCartByUsername/' + username + "/" + route.params.restaurantId);  // Modify to get all carts for the user in the restaurant
@@ -176,6 +175,7 @@ const ReservationScreen = ({ navigation, route }) => {
                     });
                     if (response.data.qrCodeUrl) {
                         setQrCode(response.data.qrCodeUrl);
+                        navigation.navigate('tab', { screen: 'reservationList' });
                     } else {
                         console.error('Error generating QR Code');
                     }
@@ -215,7 +215,7 @@ const ReservationScreen = ({ navigation, route }) => {
     );
     useFocusEffect(
         React.useCallback(() => {
-            console.log(route.params.startTime+" "+route.params.endTime);
+            console.log(route.params.startTime + " " + route.params.endTime);
         }, [route.params.startTime || route.params.endTime])
     );
 
@@ -352,46 +352,49 @@ const ReservationScreen = ({ navigation, route }) => {
                             <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.payment}>
-                        <Text style={styles.TextPromotion1}>ชำระเงินโดย</Text>
-                        <TouchableOpacity style={styles.LayoutPayment}>
-                            <MaterialIcons name="qr-code-2" size={35} color="black" width='10%' />
-                            <Text style={styles.TextPayment}>ชำระผ่าน QR code</Text>
-                            <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginRight={10} marginLeft='auto' />
-                        </TouchableOpacity>
-                    </View>
-                    {qrCode && (
+                    {reservation.status !== "ยกเลิกแล้ว" && (
+                        <View style={styles.payment}>
+                            <Text style={styles.TextPromotion1}>ชำระเงินโดย</Text>
+                            <TouchableOpacity style={styles.LayoutPayment}>
+                                <MaterialIcons name="qr-code-2" size={35} color="black" width="10%" />
+                                <Text style={styles.TextPayment}>ชำระผ่าน QR code</Text>
+                                <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf="center" marginRight={10} marginLeft="auto" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+
+                    {reservation.status !== "ยกเลิกแล้ว" && qrCode && (
                         <View style={styles.QRcode}>
                             <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
                             <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
-
 
                             <View>
                                 {selectedImage && (
                                     <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
                                 )}
 
-                                <Text style={styles.QRcodeDec}>การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ" หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น" </Text>
+                                <Text style={styles.QRcodeDec}>
+                                    การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ"
+                                    หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น"
+                                </Text>
+
                                 {error && (
                                     <Text style={styles.errorText}>{error}</Text>
                                 )}
+
                                 <View style={styles.flexButton}>
                                     <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
                                         <Text style={styles.SlipTxt}>ส่งสลิป</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={uploadSlip}
-                                        style={styles.verifySlip}
-                                    >
-                                        {uploading && (<ActivityIndicator size="large" color="#0000ff" />
+                                    <TouchableOpacity onPress={uploadSlip} style={styles.verifySlip}>
+                                        {uploading && (
+                                            <ActivityIndicator size="large" color="#0000ff" />
                                         )}
                                         <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
                                     </TouchableOpacity>
-
                                 </View>
                             </View>
                         </View>
-
-
                     )}
                 </View>
             </ScrollView>

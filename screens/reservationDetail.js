@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Modal,ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Modal, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import Directions from 'react-native-maps-directions';
@@ -8,15 +8,16 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import * as ImagePicker from 'expo-image-picker';
 import Text from '../component/Text';
-
+import moment from 'moment-timezone';
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 const socket = io(apiheader);
 
 const ReservationDetailScreen = ({ route, navigation }) => {
     const { reservation } = route.params;
+    const [statusLocation, setStatusLocation] = useState(reservation.statusLocation);
     const [location, setLocation] = useState(null);
     const [uploadResult, setUploadResult] = useState(null);
-
+    const mapRef = useRef(null);
     const [uploading, setUploading] = useState(false);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [isArrived, setIsArrived] = useState(false);
@@ -38,16 +39,17 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             setSelectedImage(result.assets[0].uri);
         }
     };
+    const fetchRestaurantLocation = async () => {
+        try {
+            const response = await axios.get(apiheader + '/reservation/getLocationById/' + reservation.restaurant_id._id);
+            setLocation(response.data);
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error', 'Failed to fetch restaurant location');
+        }
+    };
     useEffect(() => {
-        const fetchRestaurantLocation = async () => {
-            try {
-                const response = await axios.get(apiheader + '/reservation/getLocationById/' + reservation.restaurant_id._id);
-                setLocation(response.data);
-            } catch (error) {
-                console.error(error);
-                Alert.alert('Error', 'Failed to fetch restaurant location');
-            }
-        };
+
 
         const fetchCurrentLocation = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -120,6 +122,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                             const response = await axios.put(apiheader + '/reservation/statusLocation/' + reservation._id);
                             if (response.data.status === "statusLocation updated to showLocation") {
                                 Alert.alert('คุณสามารถดูตำแหน่งไปยังร้านอาหารได้');
+                                setStatusLocation("showLocation");
                             }
                         } catch (error) {
                             console.error(error);
@@ -149,9 +152,9 @@ const ReservationDetailScreen = ({ route, navigation }) => {
         if (!selectedImage) return;
 
         try {
-            setUploading(true); 
-            setUploadResult(null); 
-            setError(null); 
+            setUploading(true);
+            setUploadResult(null);
+            setError(null);
             console.log(reservation.total)
             const fileBuffer = await fetch(selectedImage).then((res) => res.arrayBuffer());
             const fileName = selectedImage.split('/').pop();
@@ -159,7 +162,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
             const reservationId = reservation._id
-            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username,reservationId });
+            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username, reservationId });
 
             socket.on('uploadSlipSuccess', (response) => {
                 setUploading(false);
@@ -180,15 +183,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             setError(`Error: ${e.message}`);
         }
     };
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
-    };
+
 
     useEffect(() => {
         if (isArrived) {
@@ -200,7 +195,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
         }
     }, [isArrived])
     useEffect(() => {
-        console.log(reservation.Payment)
+
         const genqr = async (amount) => {
             try {
                 const response = await axios.post(apiheader + '/payment/createQRpayment', {
@@ -227,32 +222,62 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             </View>
         );
     }
+    useEffect(() => {
+        if (mapRef.current && location && currentLocation) {
+            mapRef.current.fitToCoordinates(
+                [
+                    {
+                        latitude: location.coordinates.latitude,
+                        longitude: location.coordinates.longitude,
+                    },
+                    {
+                        latitude: currentLocation.latitude,
+                        longitude: currentLocation.longitude,
+                    }
+                ],
+                {
+                    edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+                    animated: true,
+                }
+            );
+        }
+    }, [location, currentLocation]);
 
     return (
         <View style={styles.container}>
             <ScrollView>
                 <View style={styles.restaurantContainer}>
-                    <View style={[styles.details,
-                    reservation.status === "ยืนยันแล้ว" && { borderColor: 'green' },
-                    reservation.status === "ยกเลิกการจองแล้ว" && { borderColor: 'red' }]}>
+                    <View style={[
+                        styles.details,
+                        reservation.status === "ยกเลิกการจองแล้ว" ? { borderColor: 'red' } : // Case 4: Canceled reservation
+                            (!reservation.Payment || reservation.Payment.length === 0) ? { borderColor: 'orange' } : // Case 1 & 2: Waiting for payment
+                                reservation.status === "ยืนยันแล้ว" ? { borderColor: 'green' } : // Case 3: Confirmed and paid
+                                    {} // Default (no extra styling)
+                    ]}>
                         <View style={styles.flextitleheader}>
                             <Text style={styles.restaurantName}>{reservation.restaurant_id.restaurantName}</Text>
-                            <Text style={styles.timeList}> {formatDate(reservation.createdAt)}</Text>
+                            <Text style={styles.timeList}>
+                                {moment(reservation.createdAt).tz('Asia/Bangkok').format('DD-MM-YYYY HH:mm')}
+                            </Text>
                         </View>
+
                         <Text>รหัสการจอง: {reservation._id}</Text>
                         <Text>โต๊ะ: {reservation.reservedTables.map(table => table.text).join(', ')}</Text>
+                        <Text>เวลาที่จอง: {moment(reservation.startTime).utc().format('HH:mm')} - {moment(reservation.endTime).utc().format('HH:mm')}</Text>
+
                         <Text style={[
                             styles.statusres,
-                            (!reservation.Payment || reservation.Payment.length === 0) && { color: 'orange' },
-                            reservation.status === "ยืนยันแล้ว" && { color: 'green' },
-                            reservation.status === "ยกเลิกการจองแล้ว" && { color: 'red' }
+                            reservation.status === "ยกเลิกการจองแล้ว" ? { color: 'red' } : // Case 4: Canceled reservation
+                                (!reservation.Payment || reservation.Payment.length === 0) ? { color: 'orange' } : // Case 1 & 2: Waiting for payment
+                                    reservation.status === "ยืนยันแล้ว" ? { color: 'green' } : // Case 3: Confirmed and paid
+                                        {} // Default (no extra styling)
                         ]}>
-                            {(!reservation.Payment || reservation.Payment.length === 0)
-                                ? "รอการจ่ายเงิน"
-                                : reservation.status}
+                            {reservation.status === "ยกเลิกการจองแล้ว" ? "ยกเลิกแล้ว" :
+                                (!reservation.Payment || reservation.Payment.length === 0) ? "รอการจ่ายเงิน" :
+                                    reservation.status}
                         </Text>
-
                     </View>
+
                     <View style={styles.cardmanu}>
                         <Text style={styles.sectionTitle}>รายการอาหาร</Text>
                         <View style={styles.MenuTitle}>
@@ -289,10 +314,11 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                         <Text style={styles.totalReservation}>ราคารวม ฿{reservation.total}</Text>
                     </View>
 
-                    {isMapVisible && reservation.statusLocation !== 'hideLocation' && (
+                    {statusLocation !== 'hideLocation' && (
 
                         <View style={styles.mapview}>
                             <MapView
+                                ref={mapRef}
                                 style={styles.map}
                                 showsUserLocation={true}
                                 initialRegion={{
@@ -340,43 +366,44 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                             </View>
                         </TouchableOpacity>
                     )}
-                    {qrCode && (
+
+                    {reservation.status !== "ยกเลิกการจองแล้ว" && qrCode && (
                         <View style={styles.QRcode}>
                             <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
                             <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
-
 
                             <View>
                                 {selectedImage && (
                                     <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
                                 )}
 
-                                <Text style={styles.QRcodeDec}>การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ" หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น" </Text>
+                                <Text style={styles.QRcodeDec}>
+                                    การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ"
+                                    หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น"
+                                </Text>
+
                                 {error && (
                                     <Text style={styles.errorText}>{error}</Text>
                                 )}
+
                                 <View style={styles.flexButton}>
                                     <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
                                         <Text style={styles.SlipTxt}>ส่งสลิป</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={uploadSlip}
-                                        style={styles.verifySlip}
-                                    >
-                                        {uploading && (<ActivityIndicator size="large" color="#0000ff" />
+                                    <TouchableOpacity onPress={uploadSlip} style={styles.verifySlip}>
+                                        {uploading && (
+                                            <ActivityIndicator size="large" color="#0000ff" />
                                         )}
                                         <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
                                     </TouchableOpacity>
-
                                 </View>
                             </View>
                         </View>
-
-
                     )}
                 </View>
             </ScrollView>
 
-            {reservation.status === "ยืนยันแล้ว" && (
+            {reservation.status === "ยืนยันแล้ว" && statusLocation !== "showLocation" && (
                 <View style={styles.layuotButton}>
                     <TouchableOpacity style={styles.buttonGotores} onPress={locationOn}>
                         <Text style={styles.buttonGotoresText}>เริ่มเดินทาง</Text>
