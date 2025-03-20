@@ -74,6 +74,8 @@ const ReservationListScreen = ({ route, navigation }) => {
                     </View>
                     <View style={styles.box}>
                         <View style={styles.flexLists}>
+                            <Text style={styles.NameResList}>{item.restaurant_id.restaurantName}</Text>
+
                             <Text style={[
                                 styles.status,
                                 {
@@ -92,6 +94,7 @@ const ReservationListScreen = ({ route, navigation }) => {
 
 
                         <View style={styles.flexList} >
+
                             <Image
                                 style={styles.logoTable}
                                 source={require('../assets/images/table.png')}
@@ -255,7 +258,7 @@ const styles = StyleSheet.create({
     },
     tableList: {
         marginTop: 10,
-        marginLeft:5
+        marginLeft: 5
     },
 
 });

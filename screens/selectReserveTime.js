@@ -52,49 +52,40 @@ const ReserveTime = ({ navigation, route }) => {
         const currentHour = currentTime.hours();
         let availableTimes = [];
         let reservedHours = new Set();
-    
-        // Get the restaurant's open and close times from route params
-        let openTime = parseInt(route.params.restaurantDetails.activeTime.open);  // Restaurant opening time
-        let closeTime = parseInt(route.params.restaurantDetails.activeTime.close);  // Restaurant closing time
-        console.log(closeTime)
-    
-        // Filter reserved hours based on reserved times
+
         if (Object.keys(reservedTimes).length > 0) {
             route.params.selectedTables.forEach((table) => {
                 reservedTimes[table._id]?.forEach((time) => {
                     const reservedStart = moment(time.startTime).utc().hours();
                     const reservedEnd = moment(time.endTime).utc().hours();
-                    console.log(reservedTimes)
                     for (let i = reservedStart; i < reservedEnd; i++) {
                         reservedHours.add(i);
                     }
                 });
             });
         }
-    
-        // Ensure available start times are generated, starting from the restaurant's open time
-        for (let i = Math.max(currentHour + 1, openTime); i < closeTime; i++) {  // Ensure start time is >= openTime and < closeTime
+
+        // Ensure available hours are generated, even if no reservations exist
+        for (let i = currentHour + 1; i <= 24; i++) {
             if (!reservedHours.has(i)) {
                 availableTimes.push({ label: `${i}:00`, value: i });
             }
         }
-    
+
         setAvailableHours(availableTimes);
-    
+
         // Auto-set available end times if there's an available start time
         if (availableTimes.length > 0) {
             updateAvailableEndTimes(availableTimes[0].value);
         }
     };
-    
+
+
     const updateAvailableEndTimes = (selectedStartTime) => {
         let availableEndTimesList = [];
         let reservedEndHours = new Set();
-    
-        // Get the restaurant's close time from route params
-        let closeTime = parseInt(route.params.restaurantDetails.activeTime.close);  // Restaurant closing time
-    
-        // Filter reserved end hours that might affect available end times
+
+        // Get reserved start hours that might affect end times
         route.params.selectedTables.forEach((table) => {
             reservedTimes[table._id]?.forEach((time) => {
                 const reservedStart = moment(time.startTime).utc().hours();
@@ -103,18 +94,15 @@ const ReserveTime = ({ navigation, route }) => {
                 }
             });
         });
-    
-        // Generate available end times (Allow selecting 16:00, but before close time)
-        for (let i = selectedStartTime + 1; i < closeTime; i++) {  // Ensure end time is after start time and before close time
-            if (!reservedEndHours.has(i)) {
-                availableEndTimesList.push({ label: `${i}:00`, value: i });
-            }
+
+        // Generate available end times (Allow selecting 16:00)
+        for (let i = selectedStartTime + 1; i <= 24; i++) {
+            availableEndTimesList.push({ label: `${i}:00`, value: i });
+            if (reservedEndHours.has(i)) break; // Stop when we hit a reserved slot
         }
-    
+
         setAvailableEndTimes(availableEndTimesList);
     };
-    
-
 
     const handleStartTimeChange = (value) => {
         setStartTime(value);
@@ -138,7 +126,7 @@ const ReserveTime = ({ navigation, route }) => {
 
         try {
             const response = await axios.post(`${apiheader}/tables/checkconflictedreservedTables`, {
-                restaurant_id: route.params.restaurantDetails._id,
+                restaurant_id: route.params.restaurantId,
                 reservedTables: route.params.selectedTables,
                 startTime: fullStartTime,
                 endTime: fullEndTime
@@ -185,7 +173,7 @@ const ReserveTime = ({ navigation, route }) => {
             )}
 
             <View style={styles.tableList}>
-                <Text style={styles.title}>เวลาที่ถูกจอง</Text>
+            <Text style={styles.title}>เวลาที่ถูกจอง</Text>
 
                 {route.params.selectedTables.map((table) => (
                     <View key={table._id} style={styles.tableItem}>

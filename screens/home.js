@@ -240,10 +240,10 @@ const HomeScreen = ({ navigation }) => {
                     onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
                     key={item._id}
                   >
-                    <View style={styles.card}>
+                    <View style={styles.searchcard}>
                       <Image
                         key={item._id}
-                        style={styles.logo}
+                        style={styles.searchlogo}
                         source={{ uri: imageUris[item._id] || "" }}
                       />
                       <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
@@ -319,52 +319,7 @@ const HomeScreen = ({ navigation }) => {
 
         )}
 
-        {searchQuery === '' && (
-          <Text style={styles.pmtsub}>ร้านอาหารโปรโมชั่น</Text>
-        )}
-        {searchQuery === '' && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} >
-            <View style={styles.restaurantListContainer}>
-              {Array.isArray(restaurants) ? (
-                restaurants
-                  .filter((item) => item.status === "open") // Only show restaurants with "open" status
-                  .map((item, index) => (
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('RestaurantDetail', { restaurantId: item._id, restaurantName: item.restaurantName })}
-                      key={item._id}
-                    >
-                      <View style={styles.card}>
-                        <Image
-                          key={item._id}
-                          style={styles.logo}
-                          source={{ uri: imageUris[item._id] || "" }}
-                        />
-                        <TouchableOpacity onPress={() => toggleFavorite(item._id)} style={styles.favoriteIcon}>
-                          <FontAwesome name={favorites.includes(item._id) ? "star" : "star-o"} size={24} color="gold" />
-                        </TouchableOpacity>
-
-                        <View style={styles.text}>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Text>
-                            {item.status == "closed"&& 
-                            <Text style={{ color: 'red' }}>ปิด </Text>
-                            
-                            }
-                            <Text style={styles.restaurantName}>{item.restaurantName}</Text>
-                          </Text>
-                        </View>
-                          <Text numberOfLines={1} style={styles.restaurantDescription}>{item.description}</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))
-              ) : (
-                <View><Text>กำลังโหลดข้อมูล!</Text></View>
-              )}
-
-            </View>
-          </ScrollView>
-        )}
+        
         {searchQuery === '' && (
           <ScrollView>
             <View style={styles.underhResContainer}>
