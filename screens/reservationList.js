@@ -5,8 +5,9 @@ import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Text from '../component/Text';
-
-
+import moment from 'moment-timezone';
+import 'moment/locale/th';
+moment.locale('th');
 const apiheader = process.env.EXPO_PUBLIC_apiURI;
 
 const ReservationListScreen = ({ route, navigation }) => {
@@ -78,13 +79,13 @@ const ReservationListScreen = ({ route, navigation }) => {
                                 styles.status,
                                 {
                                     backgroundColor:
-                                        item.status === "ยกเลิกการจองแล้ว" ? 'red' : // Case 4: Canceled reservation
-                                            (!item.Payment || item.Payment.length === 0) ? '#FFA500' : // Case 1 & 2: Waiting for payment
-                                                item.status === "ยืนยันแล้ว" ? '#1FD46D' : // Case 3: Confirmed and paid
-                                                    '#D3D3D3' // Default light gray
+                                        item.status === "ยกเลิกการจองแล้ว" ? 'red' : 
+                                            (!item.Payment || item.Payment.length === 0) ? '#FFA500' : 
+                                                item.status === "ยืนยันแล้ว" ? '#1FD46D' : 
+                                                    '#D3D3D3' 
                                 }
                             ]}>
-                                {item.status === "ยกเลิกการจองแล้ว" ? "ยกเลิกการจองแล้ว" : // Display "ยกเลิกแล้ว" for canceled reservation
+                                {item.status === "ยกเลิกการจองแล้ว" ? "ยกเลิกการจองแล้ว" : 
                                     (!item.Payment || item.Payment.length === 0) ? "รอการจ่ายเงิน" :
                                         item.status}
                             </Text>
@@ -102,7 +103,7 @@ const ReservationListScreen = ({ route, navigation }) => {
                         </View>
 
                         <View style={styles.flexListss}>
-                            <Text style={styles.timeList}> {formatDate(item.createdAt)}</Text>
+                            <Text style={styles.timeList}> {moment(item.createdAt).tz("Asia/Bangkok").format('Do MMMM HH:mm')}</Text>
                             <Text style={styles.TotalList}>฿ {item.total}</Text>
                         </View>
                     </View>

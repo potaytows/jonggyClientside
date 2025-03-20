@@ -352,50 +352,6 @@ const ReservationScreen = ({ navigation, route }) => {
                             <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
                         </TouchableOpacity>
                     </View>
-                    {reservation.status !== "ยกเลิกแล้ว" && (
-                        <View style={styles.payment}>
-                            <Text style={styles.TextPromotion1}>ชำระเงินโดย</Text>
-                            <TouchableOpacity style={styles.LayoutPayment}>
-                                <MaterialIcons name="qr-code-2" size={35} color="black" width="10%" />
-                                <Text style={styles.TextPayment}>ชำระผ่าน QR code</Text>
-                                <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf="center" marginRight={10} marginLeft="auto" />
-                            </TouchableOpacity>
-                        </View>
-                    )}
-
-                    {reservation.status !== "ยกเลิกแล้ว" && qrCode && (
-                        <View style={styles.QRcode}>
-                            <Text style={styles.QRcodeTitle}>สแกน QR code เพื่อชำระเงิน</Text>
-                            <Image source={{ uri: qrCode }} style={styles.QRcodeimg} />
-
-                            <View>
-                                {selectedImage && (
-                                    <Image source={{ uri: selectedImage }} style={styles.QRcodeimg} />
-                                )}
-
-                                <Text style={styles.QRcodeDec}>
-                                    การชำระเงินทำการ "กดส่งสลิป" เมื่อเสร็จสิ้นแล้วให้ทำการ "กดตรวจสอบ"
-                                    หากตรวจสอบผ่านแล้วจะขึ้นสถานะว่า "ชำระเงินเสร็จสิ้น"
-                                </Text>
-
-                                {error && (
-                                    <Text style={styles.errorText}>{error}</Text>
-                                )}
-
-                                <View style={styles.flexButton}>
-                                    <TouchableOpacity onPress={selectImage} style={styles.sendSlip}>
-                                        <Text style={styles.SlipTxt}>ส่งสลิป</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={uploadSlip} style={styles.verifySlip}>
-                                        {uploading && (
-                                            <ActivityIndicator size="large" color="#0000ff" />
-                                        )}
-                                        <Text style={styles.SlipTxt}>ตรวจสอบ</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    )}
                 </View>
             </ScrollView>
             <View style={styles.modal}>
