@@ -132,6 +132,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           restaurantId: route.params.restaurantId,
           restaurantName: restaurantDetails.restaurantName,
           selectedTables: selected,
+          restaurantDetails:restaurantDetails
         });
       }
     } catch (error) {
