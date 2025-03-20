@@ -85,20 +85,22 @@ const ReserveTime = ({ navigation, route }) => {
         let availableEndTimesList = [];
         let reservedEndHours = new Set();
 
-        // Get reserved start hours that might affect end times
+
         route.params.selectedTables.forEach((table) => {
             reservedTimes[table._id]?.forEach((time) => {
                 const reservedStart = moment(time.startTime).utc().hours();
-                if (reservedStart > selectedStartTime) {  // Ensure we check after start time
+                if (reservedStart > selectedStartTime) { 
+                    console.log("reserve Start :"+reservedStart)
                     reservedEndHours.add(reservedStart);
                 }
             });
         });
 
-        // Generate available end times (Allow selecting 16:00)
+
+
         for (let i = selectedStartTime + 1; i <= 24; i++) {
             availableEndTimesList.push({ label: `${i}:00`, value: i });
-            if (reservedEndHours.has(i)) break; // Stop when we hit a reserved slot
+            if (reservedEndHours.has(i)) break;
         }
 
         setAvailableEndTimes(availableEndTimesList);

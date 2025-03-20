@@ -352,7 +352,9 @@ const ReservationScreen = ({ navigation, route }) => {
                             <Ionicons name="chevron-forward-outline" size={24} color="black" alignSelf='center' marginTop='8' marginRight={10} />
                         </TouchableOpacity>
                     </View>
+
                    
+
                 </View>
             </ScrollView>
             <View style={styles.modal}>
