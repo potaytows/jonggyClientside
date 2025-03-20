@@ -27,6 +27,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
     const [qrCode, setQrCode] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [error, setError] = useState(null);
+  const [restaurantDetails, setRestaurantDetails] = useState(null);
 
     const selectImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -162,7 +163,10 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             const login = await JSON.parse(await SecureStore.getItemAsync("userCredentials"));
             const username = login.username;
             const reservationId = reservation._id
-            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username, reservationId });
+            const restaurant_id = restaurantDetails._id
+
+            console.log()
+            socket.emit('uploadSlip', { fileBuffer, fileName, totalP, username, reservationId,restaurant_id});
 
             socket.on('uploadSlipSuccess', (response) => {
                 setUploading(false);
@@ -183,7 +187,16 @@ const ReservationDetailScreen = ({ route, navigation }) => {
             setError(`Error: ${e.message}`);
         }
     };
-
+    const fetchRestaurantDetails = async () => {
+        try {
+          const response = await axios.get(apiheader + '/restaurants/' + reservation.restaurant_id._id);
+          const result = await response.data;
+          console.log(result)
+          setRestaurantDetails(result);
+        } catch (error) {
+          console.error(error);
+        }
+      };
 
     useEffect(() => {
         if (isArrived) {
@@ -213,7 +226,8 @@ const ReservationDetailScreen = ({ route, navigation }) => {
         if (!reservation?.Payment || reservation.Payment.length === 0) {
             genqr(reservation.totalPrice)
         }
-    }, [reservation]);
+        fetchRestaurantDetails()
+    }, []);
     if (!reservation) {
         return (
             <View style={styles.container}>

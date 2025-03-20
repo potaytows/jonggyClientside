@@ -115,10 +115,10 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
       );
       const reservations = response.data;
 
-      if (reservations.length > 0) {
+      if (reservations.some(reservation => reservation.status === "ยืนยันแล้ว" || reservation.status === "รอการยืนยัน")) {
         Alert.alert(
-          "คุณมีการจองอยู่แล้ว",
-          "คุณมีการจองที่ร้านนี้อยู่แล้ว ต้องการดูรายการจองของคุณหรือไม่?",
+          "คุณมีการจองที่ยืนยันแล้ว",
+          "คุณมีการจองที่ร้านนี้ที่ได้รับการยืนยันแล้ว ต้องการดูรายการจองของคุณหรือไม่?",
           [
             { text: "ยกเลิก", style: "cancel" },
             {
@@ -132,7 +132,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
           restaurantId: route.params.restaurantId,
           restaurantName: restaurantDetails.restaurantName,
           selectedTables: selected,
-          restaurantDetails:restaurantDetails
+          restaurantDetails: restaurantDetails
         });
       }
     } catch (error) {
@@ -166,6 +166,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
     checkLoginStatus();
     getTables();
     getUserDetail();
+  
   }, []);
   useFocusEffect(
     React.useCallback(() => {
@@ -190,9 +191,12 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
               <Image style={styles.logoRes} source={{ uri: `${apiheader}/image/getRestaurantIcon/${restaurantDetails._id}?timestamp=${new Date().getTime()}` }} />
             </View>
             <View style={styles.nameContainer}>
-              <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
+              <View>
+                <Text style={styles.restaurantName}>{restaurantDetails.restaurantName}</Text>
+                <Text style={styles.description}>{restaurantDetails.description}</Text>
+              </View>
               <TouchableOpacity onPress={() => toggleFavorite(restaurantDetails._id)} style={styles.favoriteIcon}>
-                <FontAwesome name={favorites.includes(restaurantDetails._id) ? "star" : "star-o"} size={24} color="gold" />
+                <FontAwesome style={styles.Icon} name={favorites.includes(restaurantDetails._id) ? "star" : "star-o"} size={24} color="gold" />
               </TouchableOpacity>
             </View>
 
@@ -277,11 +281,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   restaurantName: {
+    flex:1,
     marginLeft: 10,
     marginTop: 5,
     fontSize: 18,
     color: '#FF914D',
     fontWeight: 'bold'
+  },
+  description: {
+    marginLeft: 10,
+    marginTop: 5,
+
   },
   reserveButton: {
     position: 'absolute',
@@ -372,9 +382,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10
   }, nameContainer: {
+    flex:1,
     flexDirection: "row", // Puts name & star in a row
-    alignItems: "center", // Aligns them vertically
     gap: 8, // Space between text and star
+  },
+  favoriteIcon: {
+    flex: 1,
+    marginTop: 5,
+    marginRight:10
+  },
+  Icon:{
+    marginLeft:'auto',
+
   }
 
 });
