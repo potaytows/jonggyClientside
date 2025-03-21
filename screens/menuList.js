@@ -37,7 +37,7 @@ const MenuList = ({ route, navigation }) => {
         try {
             const response = await axios.get(`${apiheader}/menus/getMenus/${route.params.restaurantId}`);
             const result = await response.data;
-            setMenuItems(result);
+            setMenuItems(result.menus);
         } catch (error) {
             console.error(error);
         }
@@ -100,8 +100,9 @@ const MenuList = ({ route, navigation }) => {
 
                 </View>
             </View>
-            <Text style={styles.recommend}>เมนูแนะนำ</Text>
+            <Text style={styles.recommend}>เมนูทั้งหมด</Text>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
+                
             <View style={styles.restaurantListContainer}>
 
                     {menuItems && menuItems.map((item, index) => (
