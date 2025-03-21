@@ -65,8 +65,9 @@ const ReserveTime = ({ navigation, route }) => {
             });
         }
 
-        // Ensure available hours are generated, even if no reservations exist
-        for (let i = currentHour + 1; i <= 24; i++) {
+        const delayHour = parseInt(route.params.restaurantDetails.reservationGap);
+        console.log(delayHour)
+        for (let i = currentHour + delayHour; i <= 24; i++) {
             if (!reservedHours.has(i)) {
                 availableTimes.push({ label: `${i}:00`, value: i });
             }

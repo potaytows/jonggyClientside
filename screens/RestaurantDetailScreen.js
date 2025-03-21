@@ -115,7 +115,7 @@ const RestaurantDetailScreen = ({ route, navigation }) => {
       );
       const reservations = response.data;
 
-      if (reservations.some(reservation => reservation.status === "ยืนยันแล้ว" || reservation.status === "รอการยืนยัน")) {
+      if (reservations.some(reservation =>reservation.status === "รอการยืนยัน")) {
         Alert.alert(
           "คุณมีการจองที่ยืนยันแล้ว",
           "คุณมีการจองที่ร้านนี้ที่ได้รับการยืนยันแล้ว ต้องการดูรายการจองของคุณหรือไม่?",
