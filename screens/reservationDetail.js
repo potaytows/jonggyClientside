@@ -28,6 +28,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [error, setError] = useState(null);
   const [restaurantDetails, setRestaurantDetails] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const selectImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -417,7 +418,7 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                 </View>
             </ScrollView>
 
-            {reservation.status === "ยืนยันแล้ว" && statusLocation !== "showLocation" && (
+            {reservation.status === "ยืนยันแล้ว" && reservation.Payment[0].status === 'success'  && statusLocation !== "showLocation" && (
                 <View style={styles.layuotButton}>
                     <TouchableOpacity style={styles.buttonGotores} onPress={locationOn}>
                         <Text style={styles.buttonGotoresText}>เริ่มเดินทาง</Text>
@@ -431,6 +432,17 @@ const ReservationDetailScreen = ({ route, navigation }) => {
                     </TouchableOpacity>
                 </View>
             )}
+            <View style={styles.modal}>
+                <Modal visible={isModalVisible} >
+                    <View style={styles.layoutModal}>
+                        <Image
+                            source={require('../assets/images/invoice.png')}
+                            style={styles.iconModal}
+                        />
+                        <Text style={styles.successText}>{uploadResult}</Text>
+                    </View>
+                </Modal>
+            </View>
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -695,6 +707,38 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center'
     },
+    errorText:{
+        textAlign:'center',
+        margin:10,
+        fontSize:16,
+        color:'red'
+    },
+    layoutModal: {
+        width: 300,
+        height: 320,
+        position: "absolute",
+        top: '50%',
+        left: '50%',
+        transform: "translate(-50%, -50%)"
+    },
+    iconModal: {
+        width: 300,
+        height: 300,
+        position: "absolute",
+        top: '30%',
+        left: '50%',
+        transform: "translate(-50%, -50%)"
+    },
+    successText: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign: 'center',
+        position: "absolute",
+        bottom: 0,
+        left: '50%',
+        transform: "translate(-50%, -50%)"
+    }
 });
 
 export default ReservationDetailScreen;
