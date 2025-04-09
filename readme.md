@@ -1,15 +1,30 @@
 
-# Jongy Client-Side
-This is an Client-side application for Jongy
+# Jongy Owner-Side
+This is an owner-side application for Jonggy
 
 
 ## Contributors
 
-- [@Ntpply(Niti)](https://github.com/Ntpply)
-- [@potaytows(Chi)](https://github.com/potaytows)
+- [@Potaytows(Chi)](https://github.com/potaytows)
+
 ## Related Repositories
-- [JongyApi](https://github.com/potaytows/JongyApi)
-- [JongyOwnerSide](https://github.com/potaytows/JongyOwnerSide)
 - [JongyAdminSide](https://github.com/potaytows/JongyAdminSide)
+- [JongyApi](https://github.com/potaytows/JongyApi)
+- [JongyClientSide](https://github.com/potaytows/jongyClientside)
+
+
+## Installation
+
+To run server first you have to install all needed dependencies by running
+
+```bash
+  $ npm install --force
+```
+
+Then run 
+
+```bash
+  $ npm start
+```
 
 
