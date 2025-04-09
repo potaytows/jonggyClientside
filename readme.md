@@ -1,5 +1,5 @@
 
-# Jongy Owner-Side
+# Jonggy Owner-Side
 This is an owner-side application for Jonggy
 
 
@@ -8,10 +8,9 @@ This is an owner-side application for Jonggy
 - [@Potaytows(Chi)](https://github.com/potaytows)
 
 ## Related Repositories
-- [JongyAdminSide](https://github.com/potaytows/JongyAdminSide)
-- [JongyApi](https://github.com/potaytows/JongyApi)
-- [JongyClientSide](https://github.com/potaytows/jongyClientside)
-
+- [JonggyApi](https://github.com/potaytows/JongyApi)
+- [JonggyAdminSide](https://github.com/potaytows/JonggyAdminSide)
+- [JonggyOwnerSide](https://github.com/potaytows/JonggyOwnerSide)
 
 ## Installation
 
