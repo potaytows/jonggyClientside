@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView, ToastAndroid } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import AutoHeightImage from 'react-native-auto-height-image';
 import _ from 'lodash';
 import Text from '../component/Text';
 
