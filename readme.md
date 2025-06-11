@@ -6,7 +6,7 @@ This is an owner-side application for Jonggy
 ## Contributors
 
 - [@Potaytows(Chi)](https://github.com/potaytows)
-- [@Ntpply(Niti)](https://github.com/Ntpply))
+- [@Ntpply(Niti)](https://github.com/Ntpply)
 
 ## Related Repositories
 - [JonggyApi](https://github.com/potaytows/JongyApi)
