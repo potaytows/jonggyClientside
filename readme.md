@@ -1,6 +1,7 @@
 
-# Jonggy Owner-Side
-This is an owner-side application for Jonggy
+# Jonggy Client-Side
+
+This is an Client-Side application for Jonggy
 
 
 ## Contributors
