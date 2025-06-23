@@ -1,7 +1,7 @@
 
 # Jonggy Client-Side
 
-This is an Client-Side application for Jonggy
+This is a Client-Side application for Jonggy
 
 
 ## Contributors
